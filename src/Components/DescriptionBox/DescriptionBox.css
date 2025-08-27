@@ -1,0 +1,54 @@
+.descriptionBox {
+  width: 100%;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.descriptionBox-navigator {
+  display: flex;
+  gap: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.descriptionBox-nav-box {
+  font-size: 16px;
+  font-weight: 600;
+  color: #444;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 6px 6px 0 0;
+}
+
+.descriptionBox-nav-box:not(.fade) {
+  color: #0077ff;
+  border-bottom: 3px solid #0077ff;
+}
+
+.fade {
+  color: #777;
+}
+
+.descriptionBox-nav-box:hover {
+  color: #0077ff;
+  background-color: #f7f9fc;
+}
+
+.descriptionBox-description {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #444;
+}
+
+.descriptionBox-description p {
+  margin-bottom: 16px;
+  text-align: justify;
+}

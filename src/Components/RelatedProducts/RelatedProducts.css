@@ -1,0 +1,74 @@
+.relatedproducts {
+  width: 100%;
+  padding: 40px 8%;
+  background: #f9f9f9;
+  text-align: center;
+}
+
+.relatedproducts h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+.relatedproducts hr {
+  width: 80px;
+  height: 3px;
+  background: #ff6a00;
+  border: none;
+  margin: 0 auto 40px;
+  border-radius: 2px;
+}
+
+.relatedproducts-item {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.item {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.item img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.item h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item p {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ff6a00;
+}
+
+.item p .old {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #999;
+  text-decoration: line-through;
+  margin-left: 8px;
+}
