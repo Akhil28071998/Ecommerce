@@ -1,141 +1,131 @@
+/* Navbar.css */
+
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 22px 40px;  /* pehle 15px tha, ab thoda zyada */
-  background: linear-gradient(90deg, #fff 60%, #f7e9ff 100%);
-  color: #222;
+  padding: 18px 40px;
+  background: linear-gradient(90deg, #ffffff 60%, #f7e9ff 100%);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .nav-logo {
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
 }
 
 .nav-logo img {
-  height: 45px;
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
 }
 
-.nav-logo p {
+.nav-logo h2 {
   font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: #ff4d4d;
-  text-transform: uppercase;
+  color: #222;
+  margin: 0;
 }
 
 .nav-menu {
   display: flex;
+  gap: 25px;
   list-style: none;
-  gap: 30px;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-menu li {
   position: relative;
-  cursor: pointer;
 }
 
 .nav-menu a {
   text-decoration: none;
-  font-size: 1.5rem;
+  color: #555;
+  font-size: 1rem;
   font-weight: 500;
-  color: #140e0e;
-  transition: color 0.3s ease;
-  cursor: pointer;
+  padding: 5px 0;
+  transition: all 0.3s ease;
 }
 
 .nav-menu a:hover {
-  color: #ff4d4d;
+  color: #7b3fe4;
 }
 
-.nav-menu li::after {
-  content: "";
-  position: absolute;
-  width: 0%;
-  height: 2px;
-  background: #ff4d4d;
-  bottom: -4px;
-  left: 0;
-  transition: width 0.3s ease;
-}
-
-.nav-menu li:hover::after {
-  width: 100%;
+.nav-menu a.active {
+  color: #7b3fe4;
+  font-weight: 600;
+  border-bottom: 2px solid #7b3fe4;
 }
 
 .nav-login-cart {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
+  position: relative;
 }
 
 .nav-login-cart button {
   padding: 8px 18px;
-  font-size: 0.9rem;
-  font-weight: 600;
   border: none;
-  border-radius: 20px;
-  background: #ff4d4d;
+  background-color: #de6c72;
   color: #fff;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
 .nav-login-cart button:hover {
-  background: #ff1a1a;
-  transform: scale(1.05);
+  background-color: #d53695;
 }
 
-.nav-login-cart img {
-  height: 28px;
+.nav-cart {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav-cart img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
   cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.nav-login-cart img:hover {
-  transform: scale(1.2);
-}
-
-.nav-login-cart button:active {
-  transform: scale(0.95);
-  background: #e60000;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
-  transition: transform 0.05s ease;
-}
-
-button:active,
-.nav-menu a:active {
-  transform: scale(0.95);
-  filter: brightness(0.9);
 }
 
 .nav-cart-count {
   position: absolute;
-  top: -10px;
+  top: -8px;
   right: -10px;
-  background-color: #ff4d4d;
-  color: white;
+  background-color: #ff3b3b;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  font-size: 0.75rem;
+  font-weight: 600;
   border-radius: 50%;
-  padding: 5px 10px;
-  font-size: 0.8rem;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.nav-menu a.active {
-  color: #ff4d4d;
-}
-
-.nav-menu a.active::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: #ff4d4d;
-  bottom: -4px;
-  left: 0;
+@media screen and (max-width: 768px) {
+  .nav-menu {
+    display: none;
+  }
+  .navbar {
+    padding: 12px 20px;
+  }
+  .nav-login-cart {
+    gap: 12px;
+  }
+  .nav-cart img {
+    width: 25px;
+    height: 25px;
+  }
 }

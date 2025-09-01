@@ -4,17 +4,18 @@ import star_icon from "../../assets/Assets/star_icon.png";
 import star_dull_icon from "../../assets/Assets/star_dull_icon.png";
 import { ShopContext } from "../../Context/ShopContext";
 
-const ProductDisplay = ({ product }) => {
-  const { addTOCart } = useContext(ShopContext);
+const ProductDisplay = (props) => {
+  const { product } = props;
+  const { addToCart } = useContext(ShopContext);
 
   const [mainImage, setMainImage] = useState(product?.image || "");
   const [lensPos, setLensPos] = useState({ x: "50%", y: "50%" });
 
-  useEffect(() => {
-    if (product?.image) {
-      setMainImage(product.image);
-    }
-  }, [product]);
+  // useEffect(() => {
+  //   if (product?.image) {
+  //     setMainImage(product.image);
+  //   }
+  // }, [product]);
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -93,7 +94,13 @@ const ProductDisplay = ({ product }) => {
           <div tabIndex={0}>XXL</div>
         </div>
 
-        <button onClick={() => addTOCart(product.id)}>ADD TO CART</button>
+        <button
+          onClick={() => {
+            addToCart(product.id);
+          }}
+        >
+          ADD TO CART
+        </button>
 
         <p className="productdisplay-right-category">
           <span>Category :</span> {product.category || "General"}

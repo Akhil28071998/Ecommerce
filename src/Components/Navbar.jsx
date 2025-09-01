@@ -1,29 +1,31 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { Link, NavLink } from "react-router-dom";
 import "./Navbar.css";
 import logo from "../assets/assets/logo.png";
 import cart_icon from "../assets/assets/cart_icon.png";
+import { ShopContext } from "../Context/ShopContext";
 
 const Navbar = () => {
   const [menu, setMenu] = useState("shop");
+  const { getTotalCartItems } = useContext(ShopContext);
 
   return (
     <div className="navbar">
       <div className="nav-logo">
         <img src={logo} alt="Logo" />
-        <h2> StyleNest</h2>
+        <h2>StyleNest</h2>
       </div>
 
       <ul className="nav-menu">
         <li>
           <NavLink
             to="/shop"
-            className={() => {
-              return window.location.pathname === "/" ||
-                window.location.pathname === "/shop"
+            className={() =>
+              window.location.pathname === "/" ||
+              window.location.pathname === "/shop"
                 ? "active"
-                : "";
-            }}
+                : ""
+            }
           >
             Shop
           </NavLink>
@@ -58,8 +60,10 @@ const Navbar = () => {
         <NavLink to="/login">
           <button>Login</button>
         </NavLink>
-        <img src={cart_icon} alt="Cart" />
-        <div className="cart-count">0</div>
+        <Link to="/cart" className="nav-cart">
+          <img src={cart_icon} alt="Cart" />
+        </Link>
+        <div className="nav-cart-count">{getTotalCartItems()}</div>
       </div>
     </div>
   );
