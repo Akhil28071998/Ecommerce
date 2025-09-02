@@ -10,6 +10,7 @@ import Footer from "./Components/Footer/Footer";
 import men_banner from "./assets/Assets/banner_mens.png";
 import women_banner from "./assets/Assets/banner_women.png";
 import kids_banner from "./assets/Assets/banner_kids.png";
+import PaymentGateway from "./Components/PaymentGateway/PaymentGateway";
 
 const App = () => {
   return (
@@ -35,6 +36,16 @@ const App = () => {
         </Route>
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<LoginSignup />} />
+        <Route
+          path="/checkout"
+          element={
+            <PaymentGateway
+              amount={1000}
+              onSuccess={() => alert("Payment Success!")}
+              onFailure={() => alert("Payment Failed!")}
+            />
+          }
+        />
       </Routes>
       <Footer />
     </BrowserRouter>
