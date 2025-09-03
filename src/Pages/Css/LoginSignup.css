@@ -1,97 +1,102 @@
+/* Container */
 .loginsignup {
-  width: 100%;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f6f8fa 0%, #eaf1ff 100%);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 20px;
-  font-family: "Poppins", sans-serif;
+  min-height: 90vh;
+  background: #f9f9f9;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .loginsignup-container {
-  width: 100%;
-  max-width: 420px;
-  background: #ffffff;
+  background: #fff;
   padding: 40px 30px;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  max-width: 90%;
 }
 
 .loginsignup-container h1 {
-  font-size: 28px;
-  font-weight: 600;
+  text-align: center;
   margin-bottom: 25px;
   color: #333;
 }
 
+/* Form Fields */
 .loginsignup-fields {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  margin-bottom: 20px;
 }
 
-.loginsignup-fields input {
-  padding: 14px 16px;
+.loginsignup-fields input[type="text"],
+.loginsignup-fields input[type="email"],
+.loginsignup-fields input[type="password"] {
+  padding: 12px;
+  border-radius: 8px;
   border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 15px;
+  font-size: 1rem;
   outline: none;
-  transition: all 0.3s ease;
+  transition: border 0.3s;
 }
 
 .loginsignup-fields input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+  border-color: #ff4c3b;
 }
 
-.loginsignup-container button {
-  width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 500;
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
+/* Checkbox Agreement */
+.loginsignup-agree {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.loginsignup-agree span {
+  color: #ff4c3b;
   cursor: pointer;
-  transition: 0.3s ease-in-out;
 }
 
-.loginsignup-container button:hover {
-  background: #0056b3;
-  transform: translateY(-2px);
+/* Submit Button */
+.loginsignup-fields button {
+  padding: 12px;
+  background-color: #ff4c3b;
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
+.loginsignup-fields button:hover {
+  background-color: #e04336;
+}
+
+/* Login/Signup Toggle */
 .loginsignup-login {
-  margin-top: 20px;
-  font-size: 14px;
+  text-align: center;
+  margin-top: 15px;
+  font-size: 0.95rem;
   color: #555;
 }
 
 .loginsignup-login span {
-  color: #007bff;
+  color: #ff4c3b;
   cursor: pointer;
   font-weight: 500;
 }
 
-.loginsignup-login span:hover {
-  text-decoration: underline;
-}
+/* Responsive */
+@media (max-width: 500px) {
+  .loginsignup-container {
+    padding: 30px 20px;
+  }
 
-.loginsignup-agree {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-top: 20px;
-  font-size: 13px;
-  color: #555;
-  text-align: left;
-}
-
-.loginsignup-agree input {
-  margin-top: 2px;
-  accent-color: #007bff;
+  .loginsignup-fields input,
+  .loginsignup-fields button {
+    font-size: 0.9rem;
+  }
 }

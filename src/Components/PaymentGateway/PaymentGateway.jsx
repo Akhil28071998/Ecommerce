@@ -44,7 +44,6 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
     total: null,
   };
 
-  // Calculate total
   orderSummary.total = orderSummary.items.reduce(
     (sum, item) => sum + item.price * item.qty,
     0
@@ -55,10 +54,8 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
       alert("Please select a payment option.");
       return;
     }
-
-    // Simulate payment success
     setTimeout(() => {
-      setStep(4); // Go to Success Screen
+      setStep(4);
       if (onSuccess) {
         onSuccess({
           paymentId: "demo123",
@@ -88,7 +85,6 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
         </div>
 
         <div className="pg-amazon-main">
-          {/* Step 1: Address */}
           {step === 1 && (
             <div className="pg-section">
               <h2 className="pg-title">Delivery Address</h2>
@@ -308,7 +304,7 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
               <p>
                 Payment Method: <strong>{selectedOption}</strong>
               </p>
-              <p>Total Paid: ₹{orderSummary.total}</p>
+              <p>Total Paid: ${orderSummary.total}</p>
               <button className="pay-btn" onClick={() => setStep(1)}>
                 Place Another Order
               </button>

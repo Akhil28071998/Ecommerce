@@ -114,6 +114,32 @@
   justify-content: center;
 }
 
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navbar-user span {
+  font-weight: 500;
+  color: #222;
+}
+
+.navbar-user button {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  background-color: #7b3fe4;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navbar-user button:hover {
+  background-color: #5e2db0;
+}
+
 @media screen and (max-width: 768px) {
   .nav-menu {
     display: none;

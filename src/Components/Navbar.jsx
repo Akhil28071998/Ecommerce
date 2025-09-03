@@ -1,13 +1,26 @@
-import React, { useState, useContext } from "react";
-import { Link, NavLink } from "react-router-dom";
+import React, { useState, useEffect, useContext } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import "./Navbar.css";
 import logo from "../assets/assets/logo.png";
 import cart_icon from "../assets/assets/cart_icon.png";
 import { ShopContext } from "../Context/ShopContext";
 
 const Navbar = () => {
-  const [menu, setMenu] = useState("shop");
   const { getTotalCartItems } = useContext(ShopContext);
+  const [currentUser, setCurrentUser] = useState(
+    JSON.parse(localStorage.getItem("currentUser")) || null
+  );
+
+  const location = useLocation();
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    setCurrentUser(user);
+  }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setCurrentUser(null);
+  };
 
   return (
     <div className="navbar">
@@ -57,9 +70,17 @@ const Navbar = () => {
       </ul>
 
       <div className="nav-login-cart">
-        <NavLink to="/login">
-          <button>Login</button>
-        </NavLink>
+        {currentUser ? (
+          <div className="navbar-user">
+            <span>Hello, {currentUser.name}</span>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        ) : (
+          <NavLink to="/login">
+            <button>Login</button>
+          </NavLink>
+        )}
+
         <Link to="/cart" className="nav-cart">
           <img src={cart_icon} alt="Cart" />
         </Link>

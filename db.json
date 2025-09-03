@@ -1,0 +1,9 @@
+{
+  "products": [
+    { "id": 1, "name": "Shirt", "new_price": 500, "image": "shirt.png" },
+    { "id": 2, "name": "Shoes", "new_price": 1200, "image": "shoes.png" }
+  ],
+  "cart": [
+    { "id": 1, "name": "Shirt", "new_price": 500, "image": "shirt.png", "quantity": 2 }
+  ]
+}

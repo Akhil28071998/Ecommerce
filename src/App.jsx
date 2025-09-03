@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import Shop from "./Pages/Shop";
@@ -12,7 +12,24 @@ import women_banner from "./assets/Assets/banner_women.png";
 import kids_banner from "./assets/Assets/banner_kids.png";
 import PaymentGateway from "./Components/PaymentGateway/PaymentGateway";
 
-const App = () => {
+function App() {
+  const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/products")
+      .then((res) => res.json())
+      .then((data) => setProducts(data));
+  }, []);
+
+  const addToCart = (product) => {
+    fetch("http://localhost:5000/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(product),
+    }).then(() => setCart([...cart, product]));
+  };
+
   return (
     <BrowserRouter>
       <Navbar />
@@ -50,6 +67,6 @@ const App = () => {
       <Footer />
     </BrowserRouter>
   );
-};
+}
 
 export default App;
