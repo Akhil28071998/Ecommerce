@@ -1,10 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../Context/AuthContext";
 import "./Css/LoginSignup.css";
 
 const LoginSignup = () => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(false);
+  const { login, signup } = useContext(AuthContext);
+
+  const [isLogin, setIsLogin] = useState(
+    () => window.location.pathname === "/login"
+  );
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,55 +30,35 @@ const LoginSignup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password || (!isLogin && !formData.name)) {
-      alert("Please fill all required fields");
-      return;
-    }
-
-    if (!isLogin && !formData.agree) {
-      alert("You must agree to the Terms and Privacy Policy");
-      return;
-    }
-
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    let success = false;
 
     if (isLogin) {
-      const user = users.find(
-        (u) => u.email === formData.email && u.password === formData.password
-      );
-      if (user) {
-        localStorage.setItem("currentUser", JSON.stringify(user));
-        alert(`Welcome back, ${user.name}!`);
-        navigate("/");
-      } else {
-        alert("Invalid email or password");
-      }
+      success = login(formData.email, formData.password);
     } else {
-      const emailExists = users.some((u) => u.email === formData.email);
-      if (emailExists) {
-        alert("Email already registered! Please login.");
-        return;
-      }
-
-      const newUser = {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      };
-
-      users.push(newUser);
-      localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("currentUser", JSON.stringify(newUser));
-
-      alert(`Account created successfully! Welcome, ${newUser.name}!`);
-      navigate("/");
+      success = signup(
+        formData.name,
+        formData.email,
+        formData.password,
+        formData.agree
+      );
     }
-    
-    setFormData({ name: "", email: "", password: "", agree: false });
+
+    if (success) {
+      navigate("/");
+      setFormData({ name: "", email: "", password: "", agree: false });
+    }
   };
 
   return (
     <div className="loginsignup">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+      />
       <div className="loginsignup-container">
         <h1>{isLogin ? "Login" : "Sign Up"}</h1>
         <form className="loginsignup-fields" onSubmit={handleSubmit}>

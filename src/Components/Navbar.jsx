@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import { toast } from "react-toastify";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import "./Navbar.css";
 import logo from "../assets/assets/logo.png";
@@ -20,6 +21,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     setCurrentUser(null);
+    toast.success("Logout successful!");
   };
 
   return (

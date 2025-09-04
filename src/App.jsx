@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./Components/Navbar";
 import Shop from "./Pages/Shop";
@@ -32,6 +34,14 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+      />
       <Navbar />
       <Routes>
         <Route path="/" element={<Shop />} />
@@ -58,8 +68,8 @@ function App() {
           element={
             <PaymentGateway
               amount={1000}
-              onSuccess={() => alert("Payment Success!")}
-              onFailure={() => alert("Payment Failed!")}
+              onSuccess={() => toast.success("Payment Success!")}
+              onFailure={() => toast.error("Payment Failed!")}
             />
           }
         />
