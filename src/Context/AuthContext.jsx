@@ -11,62 +11,78 @@ const AuthProvider = ({ children }) => {
     if (storedUser) setCurrentUser(storedUser);
   }, []);
 
-  const signup = (name, email, password, agree) => {
-    if (!name || !email || !password) {
-      toast.error("Please fill all required fields");
-      return false;
-    }
-    if (!agree) {
-      toast.error("You must agree to the Terms and Privacy Policy");
+  const signup = async ({ name, email, password, agree }) => {
+    if (!name || !email || !password || !agree) {
+      toast.error("Please fill all fields & agree to terms");
       return false;
     }
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const emailExists = users.some((u) => u.email === email);
-    if (emailExists) {
-      toast.error("Email already registered! Please login.");
+    try {
+      const res = await fetch(`http://localhost:5000/users?email=${email}`);
+      const existing = await res.json();
+      if (existing.length > 0) {
+        toast.error("Email already registered");
+        return false;
+      }
+
+      const newUser = { name, email, password };
+      const createRes = await fetch("http://localhost:5000/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+
+      if (createRes.ok) {
+        const createdUser = await createRes.json();
+        localStorage.setItem("currentUser", JSON.stringify(createdUser));
+        setCurrentUser(createdUser);
+        toast.success(`Account created! Welcome, ${createdUser.name}`);
+        return true;
+      }
+    } catch {
+      toast.error("Signup failed");
       return false;
     }
-
-    const newUser = { name, email, password };
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("currentUser", JSON.stringify(newUser));
-    setCurrentUser(newUser);
-
-    toast.success(`Account created successfully! Welcome, ${newUser.name}!`);
-    return true;
   };
 
-  const login = (email, password) => {
+  const login = async (email, password) => {
     if (!email || !password) {
       toast.error("Please fill all required fields");
       return false;
     }
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (user) {
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      setCurrentUser(user);
-      toast.success(`Welcome back, ${user.name}!`);
-      return true;
-    } else {
-      toast.error("Invalid email or password");
+    try {
+      const res = await fetch(
+        `http://localhost:5000/users?email=${email}&password=${password}`
+      );
+      const data = await res.json();
+      if (data.length > 0) {
+        const user = data[0];
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        setCurrentUser(user);
+        toast.success(`Welcome back, ${user.name}`);
+        return true;
+      } else {
+        toast.error("Invalid email or password");
+        return false;
+      }
+    } catch {
+      toast.error("Login failed");
       return false;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("currentUser");
     setCurrentUser(null);
+    setCartItems(getDefaultCart());
+    localStorage.removeItem("currentUser");
+    toast.info("Logged out");
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, signup, logout }}>
+    <AuthContext.Provider
+      value={{ currentUser, setCurrentUser, signup, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

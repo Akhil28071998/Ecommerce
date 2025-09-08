@@ -1,9 +1,130 @@
 {
   "products": [
-    { "id": 1, "name": "Shirt", "new_price": 500, "image": "shirt.png" },
-    { "id": 2, "name": "Shoes", "new_price": 1200, "image": "shoes.png" }
+    {
+      "id": "1",
+      "name": "Shirt",
+      "new_price": 500,
+      "image": "shirt.png"
+    },
+    {
+      "id": "2",
+      "name": "Jeans",
+      "new_price": 1200,
+      "image": "jeans.png"
+    }
   ],
   "cart": [
-    { "id": 1, "name": "Shirt", "new_price": 500, "image": "shirt.png", "quantity": 2 }
+    {
+      "id": "8919",
+      "userId": "acf2",
+      "productId": 15,
+      "quantity": 1
+    },
+    {
+      "id": "d251",
+      "userId": "acf2",
+      "productId": 3,
+      "quantity": 1
+    },
+    {
+      "id": "ed36",
+      "userId": "8b24",
+      "productId": 14,
+      "quantity": 2
+    }
+  ],
+  "users": [
+    {
+      "id": "u1",
+      "name": "Prince Kumar",
+      "email": "prince90@gmail.com",
+      "password": "121212"
+    },
+    {
+      "id": "acf2",
+      "name": "paramjeet",
+      "email": "paramjeet@gmail.com",
+      "password": "123456"
+    },
+    {
+      "id": "8b24",
+      "name": "Jass Manak",
+      "email": "Jass@gmail.com",
+      "password": "123456"
+    }
+  ],
+  "purchases": [
+    {
+      "id": "1",
+      "userId": "u1",
+      "name": "Prince Kumar",
+      "email": "prince90@gmail.com",
+      "productId": 1,
+      "productName": "Shirt",
+      "image": "shirt.png",
+      "quantity": 2,
+      "price": 1000,
+      "date": "2025-09-08T12:05:00.000Z"
+    },
+    {
+      "id": "2",
+      "userId": "u1",
+      "name": "Prince Kumar",
+      "email": "prince90@gmail.com",
+      "productId": 2,
+      "productName": "Jeans",
+      "image": "jeans.png",
+      "quantity": 1,
+      "price": 1200,
+      "date": "2025-09-08T12:10:00.000Z"
+    },
+    {
+      "id": "1e04",
+      "userId": "8b24",
+      "name": "Jass Manak",
+      "email": "Jass@gmail.com",
+      "productId": 18,
+      "productName": "Men Green Solid Zippered Full-Zip Slim Fit Bomber Jacket",
+      "image": "/src/assets/Assets/product_18.png",
+      "quantity": 1,
+      "price": 85,
+      "date": "2025-09-08T15:17:05.974Z"
+    },
+    {
+      "id": "a79e",
+      "userId": "8b24",
+      "name": "Jass Manak",
+      "email": "Jass@gmail.com",
+      "productId": 11,
+      "productName": "Modern Flutter Sleeve Shirt",
+      "image": "/src/assets/Assets/product_11.png",
+      "quantity": 1,
+      "price": 85,
+      "date": "2025-09-08T15:17:06.075Z"
+    },
+    {
+      "id": "0445",
+      "userId": "8b24",
+      "name": "Jass Manak",
+      "email": "Jass@gmail.com",
+      "productId": 10,
+      "productName": "Trendy Overlap Collar Top",
+      "image": "/src/assets/Assets/product_10.png",
+      "quantity": 1,
+      "price": 85,
+      "date": "2025-09-08T15:17:06.211Z"
+    },
+    {
+      "id": "c834",
+      "userId": "8b24",
+      "name": "Jass Manak",
+      "email": "Jass@gmail.com",
+      "productId": 15,
+      "productName": "Men Green Solid Zippered Full-Zip Slim Fit Bomber Jacket",
+      "image": "/src/assets/Assets/product_15.png",
+      "quantity": 1,
+      "price": 85,
+      "date": "2025-09-08T15:21:13.154Z"
+    }
   ]
 }

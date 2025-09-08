@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./PaymentGateway.css";
+import { ShopContext } from "../../Context/ShopContext";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const paymentMethods = [
   {
@@ -24,7 +27,9 @@ const paymentMethods = [
   },
 ];
 
-const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
+const PaymentGateway = ({ onSuccess }) => {
+  const { getCartDetails, getTotalCartAmount } = useContext(ShopContext);
+
   const [selectedOption, setSelectedOption] = useState("");
   const [step, setStep] = useState(1);
   const [address, setAddress] = useState({
@@ -36,30 +41,32 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
     pincode: "",
   });
   const [addressSaved, setAddressSaved] = useState(false);
-  const orderSummary = {
-    items: [
-      { name: "T-shirt", qty: 2, price: 499 },
-      { name: "Shoes", qty: 1, price: 1299 },
-    ],
-    total: null,
-  };
+  const [orderTotal, setOrderTotal] = useState(0);
+  const [items, setItems] = useState([]);
 
-  orderSummary.total = orderSummary.items.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0
-  );
+  // ✅ Load items from cart context
+  useEffect(() => {
+    const cartItems = getCartDetails();
+    setItems(cartItems);
+    setOrderTotal(getTotalCartAmount());
+  }, [getCartDetails, getTotalCartAmount]);
 
   const handlePayment = () => {
     if (!selectedOption) {
-      alert("Please select a payment option.");
+      toast.error("⚠️ Please select a payment option.");
       return;
     }
+
+    toast.info("Processing payment...");
+
     setTimeout(() => {
       setStep(4);
+      toast.success("🎉 Payment Successful! Order placed.");
+
       if (onSuccess) {
         onSuccess({
           paymentId: "demo123",
-          amount: orderSummary.total,
+          amount: orderTotal,
           method: selectedOption,
         });
       }
@@ -68,7 +75,11 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
 
   return (
     <div className="pg-amazon-bg">
+      {/* Toast Container */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+
       <div className="pg-amazon-container">
+        {/* Sidebar Steps */}
         <div className="pg-amazon-sidebar">
           <div className={`pg-step${step === 1 ? " active" : ""}`}>
             1. Address
@@ -84,7 +95,9 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
           </div>
         </div>
 
+        {/* Main Steps */}
         <div className="pg-amazon-main">
+          {/* Step 1: Address */}
           {step === 1 && (
             <div className="pg-section">
               <h2 className="pg-title">Delivery Address</h2>
@@ -94,6 +107,7 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
                   onSubmit={(e) => {
                     e.preventDefault();
                     setAddressSaved(true);
+                    toast.success("✅ Address saved successfully!");
                   }}
                 >
                   <input
@@ -176,7 +190,10 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
                     <button
                       className="pay-btn"
                       style={{ marginLeft: "16px" }}
-                      onClick={() => setAddressSaved(false)}
+                      onClick={() => {
+                        setAddressSaved(false);
+                        toast.info("✏️ Address edit mode enabled.");
+                      }}
                     >
                       Edit
                     </button>
@@ -186,21 +203,26 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
             </div>
           )}
 
+          {/* Step 2: Order Summary */}
           {step === 2 && (
             <div className="pg-section">
               <h2 className="pg-title">Order Summary</h2>
               <div className="pg-order-card">
-                {orderSummary.items.map((item, idx) => (
-                  <div key={idx} className="pg-order-item">
-                    <span>
-                      {item.name} (x{item.qty})
-                    </span>
-                    <span>${item.price * item.qty}</span>
-                  </div>
-                ))}
+                {items.length > 0 ? (
+                  items.map((item) => (
+                    <div key={item.id} className="pg-order-item">
+                      <span>
+                        {item.name} (x{item.qty})
+                      </span>
+                      <span>${item.price * item.qty}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div>No items in the order.</div>
+                )}
                 <div className="pg-order-total">
                   <strong>Total:</strong>
-                  <strong>${orderSummary.total}</strong>
+                  <strong>${orderTotal}</strong>
                 </div>
               </div>
               <div className="pg-nav-btns">
@@ -211,13 +233,20 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
                 >
                   Back
                 </button>
-                <button className="pay-btn" onClick={() => setStep(3)}>
+                <button
+                  className="pay-btn"
+                  onClick={() => {
+                    setStep(3);
+                    toast.info("Proceeding to payment...");
+                  }}
+                >
                   Proceed to Payment
                 </button>
               </div>
             </div>
           )}
 
+          {/* Step 3: Payment */}
           {step === 3 && (
             <div className="pg-section">
               <h2 className="pg-title">Select Payment Method</h2>
@@ -246,40 +275,6 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
                 ))}
               </div>
 
-              {selectedOption && (
-                <div className="pg-method-details">
-                  {selectedOption === "paypal" && (
-                    <p>
-                      You selected <strong>PayPal</strong>. You’ll be redirected
-                      to PayPal to complete the payment.
-                    </p>
-                  )}
-                  {selectedOption === "creditcard" && (
-                    <form className="pg-credit-form">
-                      <input type="text" placeholder="Card Number" required />
-                      <input
-                        type="text"
-                        placeholder="Expiry Date (MM/YY)"
-                        required
-                      />
-                      <input type="text" placeholder="CVV" required />
-                    </form>
-                  )}
-                  {selectedOption === "netbanking" && (
-                    <p>
-                      You selected <strong>Net Banking</strong>. Please choose
-                      your bank on the next step.
-                    </p>
-                  )}
-                  {selectedOption === "cod" && (
-                    <p>
-                      You selected <strong>Cash on Delivery</strong>. Please
-                      keep the exact amount ready.
-                    </p>
-                  )}
-                </div>
-              )}
-
               <div className="pg-nav-btns">
                 <button
                   className="pay-btn"
@@ -294,18 +289,26 @@ const PaymentGateway = ({ amount, onSuccess, onFailure }) => {
               </div>
             </div>
           )}
+
+          {/* Step 4: Success */}
           {step === 4 && (
             <div className="pg-section pg-success">
               <h2 className="pg-title">🎉 Order Successful!</h2>
               <p>
-                Thank you <strong>{address.name}</strong>! <br />
-                Your order has been placed successfully.
+                Thank you <strong>{address.name}</strong>! Your order has been
+                placed successfully.
               </p>
               <p>
                 Payment Method: <strong>{selectedOption}</strong>
               </p>
-              <p>Total Paid: ${orderSummary.total}</p>
-              <button className="pay-btn" onClick={() => setStep(1)}>
+              <p>Total Paid: ${orderTotal}</p>
+              <button
+                className="pay-btn"
+                onClick={() => {
+                  setStep(1);
+                  toast.info("You can place another order now.");
+                }}
+              >
                 Place Another Order
               </button>
             </div>

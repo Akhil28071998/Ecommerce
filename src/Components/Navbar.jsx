@@ -1,28 +1,14 @@
-import React, { useState, useEffect, useContext } from "react";
-import { toast } from "react-toastify";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, NavLink } from "react-router-dom";
 import "./Navbar.css";
 import logo from "../assets/assets/logo.png";
 import cart_icon from "../assets/assets/cart_icon.png";
 import { ShopContext } from "../Context/ShopContext";
+import { AuthContext } from "../Context/AuthContext";
 
 const Navbar = () => {
   const { getTotalCartItems } = useContext(ShopContext);
-  const [currentUser, setCurrentUser] = useState(
-    JSON.parse(localStorage.getItem("currentUser")) || null
-  );
-
-  const location = useLocation();
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("currentUser"));
-    setCurrentUser(user);
-  }, [location]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    setCurrentUser(null);
-    toast.success("Logout successful!");
-  };
+  const { currentUser, logout } = useContext(AuthContext);
 
   return (
     <div className="navbar">
@@ -33,49 +19,24 @@ const Navbar = () => {
 
       <ul className="nav-menu">
         <li>
-          <NavLink
-            to="/shop"
-            className={() =>
-              window.location.pathname === "/" ||
-              window.location.pathname === "/shop"
-                ? "active"
-                : ""
-            }
-          >
-            Shop
-          </NavLink>
+          <NavLink to="/shop">Shop</NavLink>
         </li>
         <li>
-          <NavLink
-            to="/Mens"
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            Men
-          </NavLink>
+          <NavLink to="/Mens">Men</NavLink>
         </li>
         <li>
-          <NavLink
-            to="/Womens"
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            Women
-          </NavLink>
+          <NavLink to="/Womens">Women</NavLink>
         </li>
         <li>
-          <NavLink
-            to="/Kids"
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            Kids
-          </NavLink>
+          <NavLink to="/Kids">Kids</NavLink>
         </li>
       </ul>
 
       <div className="nav-login-cart">
         {currentUser ? (
           <div className="navbar-user">
-            <span>Hello, {currentUser.name}</span>
-            <button onClick={handleLogout}>Logout</button>
+            <span>Hello, {currentUser.name}</span> {/* Display user name */}
+            <button onClick={logout}>Logout</button>
           </div>
         ) : (
           <NavLink to="/login">
@@ -85,8 +46,8 @@ const Navbar = () => {
 
         <Link to="/cart" className="nav-cart">
           <img src={cart_icon} alt="Cart" />
+          <div className="nav-cart-count">{getTotalCartItems()}</div>
         </Link>
-        <div className="nav-cart-count">{getTotalCartItems()}</div>
       </div>
     </div>
   );

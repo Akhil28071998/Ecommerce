@@ -12,6 +12,7 @@ const LoginSignup = () => {
   const [isLogin, setIsLogin] = useState(
     () => window.location.pathname === "/login"
   );
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,6 +20,7 @@ const LoginSignup = () => {
     agree: false,
   });
 
+  // ✅ Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -27,25 +29,23 @@ const LoginSignup = () => {
     });
   };
 
+  // ✅ Submit
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    let success = false;
-
     if (isLogin) {
-      success = login(formData.email, formData.password);
+      login(formData.email, formData.password).then((success) => {
+        if (success) {
+          navigate("/");
+          setFormData({ name: "", email: "", password: "", agree: false });
+        }
+      });
     } else {
-      success = signup(
-        formData.name,
-        formData.email,
-        formData.password,
-        formData.agree
-      );
-    }
-
-    if (success) {
-      navigate("/");
-      setFormData({ name: "", email: "", password: "", agree: false });
+      signup(formData).then((success) => {
+        if (success) {
+          navigate("/");
+          setFormData({ name: "", email: "", password: "", agree: false });
+        }
+      });
     }
   };
 
@@ -66,28 +66,31 @@ const LoginSignup = () => {
             <input
               type="text"
               name="name"
-              placeholder="Your Name"
+              placeholder="Enter Your Full Name"
               value={formData.name}
               onChange={handleChange}
               required
             />
           )}
+
           <input
             type="email"
             name="email"
-            placeholder="Email Address"
+            placeholder="Enter Email Address"
             value={formData.email}
             onChange={handleChange}
             required
           />
+
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Enter Password"
             value={formData.password}
             onChange={handleChange}
             required
           />
+
           {!isLogin && (
             <div className="loginsignup-agree">
               <input
@@ -103,8 +106,10 @@ const LoginSignup = () => {
               </label>
             </div>
           )}
+
           <button type="submit">{isLogin ? "Login" : "Continue"}</button>
         </form>
+
         <p className="loginsignup-login">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <span onClick={() => setIsLogin(!isLogin)}>
