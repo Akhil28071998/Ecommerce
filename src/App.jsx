@@ -1,27 +1,40 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./Components/Navbar";
 import Shop from "./Pages/Shop";
 import ShopCategory from "./Pages/ShopCategory";
-import Product from "./Pages/Product.jsx";
-import Cart from "./Pages/Cart.jsx";
-import LoginSignup from "./Pages/LoginSignup.jsx";
+import Product from "./Pages/Product";
+import Cart from "./Pages/Cart";
+import LoginSignup from "./Pages/LoginSignup";
 import Footer from "./Components/Footer/Footer";
 import PaymentGateway from "./Components/PaymentGateway/PaymentGateway";
+
+// Admin
+import AdminLayout from "./Layout/AdminLayout";
+import AdminDashboard from "./Components/AdminPanel/AdminDashboard";
+// import ManageProducts from "./Components/AdminPanel/ManageProducts";
+import ManageOrders from "./Components/AdminPanel/ManageOrders";
+import ManageUsers from "./Components/AdminPanel/ManageUsers";
+import ProtectedAdminRoute from "./Routes/ProtectedAdminRoute";
 
 import men_banner from "./assets/Assets/banner_mens.png";
 import women_banner from "./assets/Assets/banner_women.png";
 import kids_banner from "./assets/Assets/banner_kids.png";
+import { AuthContext } from "./Context/AuthContext";
 
 function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const { currentUser, setCurrentUser } = useContext(AuthContext);
+  const location = useLocation();
 
-  // Load products
+  // Hide Navbar/Footer on admin routes
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
+  // Fetch products
   useEffect(() => {
     fetch("http://localhost:5000/products")
       .then((res) => res.json())
@@ -29,14 +42,13 @@ function App() {
       .catch(() => toast.error("Failed to load products"));
   }, []);
 
-  // Load cart depending on currentUser
+  // Sync cart
   useEffect(() => {
     if (currentUser) {
       const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
       fetch(`http://localhost:5000/cart?userId=${currentUser.id}`)
         .then((res) => res.json())
         .then(async (data) => {
-          // Merge guest cart items into user cart
           for (let item of guestCart) {
             const exists = data.find((i) => i.productId === item.id);
             if (!exists) {
@@ -51,7 +63,7 @@ function App() {
               });
             }
           }
-          localStorage.removeItem("guestCart"); // Clear guest cart
+          localStorage.removeItem("guestCart");
           const res2 = await fetch(
             `http://localhost:5000/cart?userId=${currentUser.id}`
           );
@@ -88,7 +100,6 @@ function App() {
         })
         .catch(() => toast.error("Failed to add product to cart"));
     } else {
-      // Guest cart
       let guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
       guestCart.push(product);
       localStorage.setItem("guestCart", JSON.stringify(guestCart));
@@ -97,11 +108,10 @@ function App() {
     }
   };
 
-  // Logout
   const logout = () => {
     setCurrentUser(null);
-    setCart([]); // Clear cart
-    localStorage.removeItem("guestCart"); // Optional
+    setCart([]);
+    localStorage.removeItem("guestCart");
   };
 
   const categories = [
@@ -111,17 +121,14 @@ function App() {
   ];
 
   return (
-    <BrowserRouter>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-      />
-      <Navbar cart={cart} currentUser={currentUser} logout={logout} />
+    <>
+      <ToastContainer position="top-right" autoClose={3000} />
+      {!isAdminRoute && (
+        <Navbar cart={cart} currentUser={currentUser} logout={logout} />
+      )}
+
       <Routes>
+        {/* Shop Routes */}
         <Route
           path="/"
           element={<Shop products={products} addToCart={addToCart} />}
@@ -153,9 +160,25 @@ function App() {
           element={<LoginSignup setCurrentUser={setCurrentUser} />}
         />
         <Route path="/checkout" element={<PaymentGateway items={cart} />} />
+
+        {/* Admin Routes */}
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedAdminRoute>
+              <AdminLayout />
+            </ProtectedAdminRoute>
+          }
+        >
+          <Route path="dashboard" element={<AdminDashboard />} />
+          {/* <Route path="products" element={<ManageProducts />} /> */}
+          <Route path="orders" element={<ManageOrders />} />
+          <Route path="users" element={<ManageUsers />} />
+        </Route>
       </Routes>
-      <Footer />
-    </BrowserRouter>
+
+      {!isAdminRoute && <Footer />}
+    </>
   );
 }
 

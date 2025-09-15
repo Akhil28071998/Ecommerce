@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Context/AuthContext";
@@ -30,22 +30,43 @@ const LoginSignup = () => {
   };
 
   // ✅ Submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (isLogin) {
-      login(formData.email, formData.password).then((success) => {
-        if (success) {
+      // ----- LOGIN -----
+      const user = await login(formData.email, formData.password);
+
+      if (user) {
+        toast.success("Login successful!");
+
+        // Navigate based on role
+        if (user.role === "admin") {
+          navigate("/admin");
+        } else {
           navigate("/");
-          setFormData({ name: "", email: "", password: "", agree: false });
         }
-      });
+
+        setFormData({ name: "", email: "", password: "", agree: false });
+      } else {
+        toast.error("Invalid credentials!");
+      }
     } else {
-      signup(formData).then((success) => {
-        if (success) {
-          navigate("/");
-          setFormData({ name: "", email: "", password: "", agree: false });
-        }
-      });
+      // ----- SIGNUP -----
+      const newUser = {
+        ...formData,
+        role: "user", // ✅ By default every signup is a normal user
+      };
+
+      const success = await signup(newUser);
+
+      if (success) {
+        toast.success("Signup successful! Please login.");
+        setIsLogin(true);
+        setFormData({ name: "", email: "", password: "", agree: false });
+      } else {
+        toast.error("Signup failed!");
+      }
     }
   };
 

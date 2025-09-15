@@ -1,0 +1,135 @@
+.manage-users {
+  padding: 20px;
+  margin-left: 240px; /* space for sidebar */
+  margin-right: 30px; /* gap on right */
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.page-heading {
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #935c5c;
+  text-align: center;
+}
+
+.table-container {
+  overflow-x: auto;
+  background: #eeecec;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  padding: 15px;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 850px;
+}
+
+.users-table th,
+.users-table td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid #070707;
+}
+
+.users-table th {
+  background: #bfc5cb;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+}
+
+.users-table tr:hover {
+  background-color: #d6d2d2;
+}
+
+.role {
+  text-transform: capitalize;
+  font-weight: 500;
+  color: #0077cc;
+}
+
+.purchase-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.purchase-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.purchase-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #ddd;
+}
+
+.purchase-info {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.no-purchase {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.status-msg {
+  margin: 20px;
+  font-size: 1rem;
+  color: #444;
+}
+
+.status-msg.error {
+  color: red;
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 1024px) {
+  .manage-users {
+    margin-left: 200px;
+    margin-right: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .manage-users {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 15px;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .purchase-info {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .users-table {
+    min-width: 100%;
+    font-size: 0.8rem;
+  }
+
+  .purchase-img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .page-heading {
+    font-size: 1.4rem;
+  }
+}
