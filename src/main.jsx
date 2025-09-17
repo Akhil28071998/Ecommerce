@@ -6,16 +6,19 @@ import ShopProvider from "./Context/ShopContext.jsx";
 import AuthProvider from "./Context/AuthContext.jsx";
 import { ToastContainer } from "react-toastify";
 import "./index.css";
+import { ProductProvider } from "./Context/ProductContext"; // <- extension-less import
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AuthProvider>
-      <ShopProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-        <ToastContainer />
-      </ShopProvider>
-    </AuthProvider>
+    <ProductProvider>
+      <AuthProvider>
+        <ShopProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+          <ToastContainer />
+        </ShopProvider>
+      </AuthProvider>
+    </ProductProvider>
   </React.StrictMode>
 );

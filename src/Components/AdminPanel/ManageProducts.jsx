@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import React, { useEffect, useState } from "react";
 import "./ManageProduct.css";
 
 const ProductManagement = () => {
@@ -8,57 +7,64 @@ const ProductManagement = () => {
     name: "",
     price: "",
     offerPrice: "",
-    category: "mens",
+    category: "",
     quantity: "",
-    image: null,
+    image: "",
   });
+  const [editProduct, setEditProduct] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-  // ✅ Load products on mount
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 8;
+
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  // Fetch products from JSON Server
   const fetchProducts = async () => {
     try {
       const res = await fetch("http://localhost:5000/products");
       const data = await res.json();
       setProducts(data);
     } catch (err) {
-      console.error("Failed to fetch products", err);
+      console.error("Error fetching products:", err);
     }
   };
 
-  // ✅ Handle Input Change
+  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct({ ...newProduct, [name]: value });
+    if (editProduct) setEditProduct({ ...editProduct, [name]: value });
+    else setNewProduct({ ...newProduct, [name]: value });
   };
 
-  // ✅ Handle Image Upload
+  // Handle image upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewProduct({ ...newProduct, image: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (editProduct) setEditProduct({ ...editProduct, image: reader.result });
+      else setNewProduct({ ...newProduct, image: reader.result });
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
-  // ✅ Add Product
+  // Add product
   const handleAddProduct = async (e) => {
     e.preventDefault();
 
+    // Basic validation
     if (
       !newProduct.name ||
-      !newProduct.price ||
-      !newProduct.offerPrice ||
-      !newProduct.quantity ||
       !newProduct.category ||
-      !newProduct.image
+      !newProduct.price ||
+      !newProduct.quantity
     ) {
-      toast.error("All fields are required");
+      alert("Please fill in all required fields!");
       return;
     }
 
@@ -66,131 +72,208 @@ const ProductManagement = () => {
       const res = await fetch("http://localhost:5000/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProduct),
+        body: JSON.stringify({
+          ...newProduct,
+          price: parseFloat(newProduct.price) || 0,
+          offerPrice: parseFloat(newProduct.offerPrice) || 0,
+          quantity: parseInt(newProduct.quantity, 10) || 0,
+        }),
       });
 
-      if (res.ok) {
-        toast.success("Product added successfully ✅");
-        setNewProduct({
-          name: "",
-          price: "",
-          offerPrice: "",
-          category: "mens",
-          quantity: "",
-          image: null,
-        });
-        fetchProducts();
-      }
+      const addedProduct = await res.json();
+      setProducts([...products, addedProduct]);
+
+      setNewProduct({
+        name: "",
+        price: "",
+        offerPrice: "",
+        category: "",
+        quantity: "",
+        image: "",
+      });
+      setImagePreview(null);
     } catch (err) {
-      toast.error("Failed to add product");
-      console.error(err);
+      console.error("Error adding product:", err);
     }
   };
 
-  // ✅ Delete Product
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
+  // Edit product
+  const handleEditProduct = (product) => {
+    setEditProduct(product);
+    setImagePreview(product.image);
+  };
+
+  // Update product
+  const handleUpdateProduct = async (e) => {
+    e.preventDefault();
 
     try {
-      const res = await fetch(`http://localhost:5000/products/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `http://localhost:5000/products/${editProduct.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...editProduct,
+            price: parseFloat(editProduct.price) || 0,
+            offerPrice: parseFloat(editProduct.offerPrice) || 0,
+            quantity: parseInt(editProduct.quantity, 10) || 0,
+          }),
+        }
+      );
 
-      if (res.ok) {
-        toast.success("Product deleted ✅");
-        setProducts(products.filter((p) => p.id !== id));
-      } else {
-        toast.error("Failed to delete product ❌");
-      }
+      const updatedProduct = await res.json();
+      setProducts(
+        products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+      );
+
+      setEditProduct(null);
+      setImagePreview(null);
     } catch (err) {
-      console.error("Error deleting product:", err);
-      toast.error("Error deleting product");
+      console.error("Error updating product:", err);
     }
   };
+
+  // Delete product
+  const handleDeleteProduct = async (id) => {
+    try {
+      await fetch(`http://localhost:5000/products/${id}`, { method: "DELETE" });
+      setProducts(products.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error("Error deleting product:", err);
+    }
+  };
+
+  // Pagination logic
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
   return (
     <div className="product-management">
-      <h1>Manage Products</h1>
+      <h2>Product Management</h2>
 
-      {/* ===== Product Form ===== */}
-      <form className="product-form" onSubmit={handleAddProduct}>
+      {/* Add / Edit Product Form */}
+      <form
+        onSubmit={editProduct ? handleUpdateProduct : handleAddProduct}
+        className="product-form"
+      >
+        <h3>{editProduct ? "Edit Product" : "Add Product"}</h3>
+
         <input
           type="text"
           name="name"
-          placeholder="Product Title"
-          value={newProduct.name}
+          placeholder="Product Name"
+          value={editProduct ? editProduct.name : newProduct.name}
           onChange={handleChange}
+          required
         />
+
         <input
           type="number"
           name="price"
           placeholder="Price"
-          value={newProduct.price}
+          value={editProduct ? editProduct.price : newProduct.price}
           onChange={handleChange}
+          required
         />
+
         <input
           type="number"
           name="offerPrice"
           placeholder="Offer Price"
-          value={newProduct.offerPrice}
+          value={editProduct ? editProduct.offerPrice : newProduct.offerPrice}
           onChange={handleChange}
         />
+
         <select
           name="category"
-          value={newProduct.category}
+          value={editProduct ? editProduct.category : newProduct.category}
           onChange={handleChange}
+          required
         >
-          <option value="mens">Mens</option>
-          <option value="womens">Womens</option>
-          <option value="kids">Kids</option>
+          <option value="">Select Category</option>
+          <option value="Men">Men</option>
+          <option value="Women">Women</option>
+          <option value="Kids">Kids</option>
         </select>
+
         <input
           type="number"
           name="quantity"
           placeholder="Quantity"
-          value={newProduct.quantity}
+          value={editProduct ? editProduct.quantity : newProduct.quantity}
           onChange={handleChange}
+          required
         />
+
         <input type="file" accept="image/*" onChange={handleImageUpload} />
-        <button type="submit">Add Product</button>
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Preview"
+            style={{ width: "80px", height: "80px", marginTop: "10px" }}
+          />
+        )}
+
+        <button type="submit">
+          {editProduct ? "Update Product" : "Add Product"}
+        </button>
+        {editProduct && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditProduct(null);
+              setImagePreview(null);
+            }}
+            className="cancel-btn"
+          >
+            Cancel
+          </button>
+        )}
       </form>
 
-      {/* ===== Product Table ===== */}
-      <h2>Product List</h2>
-      <table className="product-table">
+      {/* Product Table */}
+      <table className="products-table">
         <thead>
           <tr>
-            <th>Image</th>
-            <th>Title</th>
+            <th>Sr. No</th>
+            <th>Preview</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Offer</th>
             <th>Category</th>
-            <th>Price ($)</th>
-            <th>Offer Price ($)</th>
-            <th>Quantity</th>
-            <th>Action</th>
+            <th>Qty</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {products.length > 0 ? (
-            products.map((p) => (
+          {currentProducts.length > 0 ? (
+            currentProducts.map((p, index) => (
               <tr key={p.id}>
+                {/* Sr. No (serial, not DB id) */}
+                <td>{indexOfFirstProduct + index + 1}</td>
                 <td>
-                  {p.image ? (
-                    <img src={p.image} alt={p.name} width="50" />
-                  ) : (
-                    "No Image"
+                  {p.image && (
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      style={{ width: "50px", height: "50px" }}
+                    />
                   )}
                 </td>
                 <td>{p.name}</td>
+                <td>${p.price}</td>
+                <td>${p.offerPrice}</td>
                 <td>{p.category}</td>
-                <td>{p.price}</td>
-                <td>{p.offerPrice}</td>
                 <td>{p.quantity}</td>
                 <td>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(p.id)}
-                  >
+                  <button onClick={() => handleEditProduct(p)}>Edit</button>
+                  <button onClick={() => handleDeleteProduct(p.id)}>
                     Delete
                   </button>
                 </td>
@@ -198,11 +281,34 @@ const ProductManagement = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="7">No products available</td>
+              <td colSpan="8">No products available.</td>
             </tr>
           )}
         </tbody>
       </table>
+
+      {/* Pagination Buttons */}
+      <div className="pagination">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Prev
+        </button>
+
+        <span className="page-info">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages || totalPages === 0}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-// src/Context/ShopContext.jsx
 import React, { createContext, useState, useEffect, useContext } from "react";
 import all_product from "../assets/Assets/all_product";
 import { AuthContext } from "./AuthContext";
@@ -13,54 +12,49 @@ const getDefaultCart = () => {
 
 const ShopProvider = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
-
   const [cartItems, setCartItems] = useState(getDefaultCart());
   const [wishlist, setWishlist] = useState([]);
   const [coupon, setCoupon] = useState(null);
 
-  // ✅ Load cart & wishlist from DB if logged in, else from localStorage
+  // Load cart & wishlist
   useEffect(() => {
-    if (!currentUser) {
-      // Guest user → load from localStorage
-      const savedCart =
-        JSON.parse(localStorage.getItem("guestCart")) || getDefaultCart();
-      const savedWishlist =
-        JSON.parse(localStorage.getItem("guestWishlist")) || [];
-      setCartItems(savedCart);
-      setWishlist(savedWishlist);
-      return;
-    }
+    const loadData = async () => {
+      if (!currentUser) {
+        const savedCart =
+          JSON.parse(localStorage.getItem("guestCart")) || getDefaultCart();
+        const savedWishlist =
+          JSON.parse(localStorage.getItem("guestWishlist")) || [];
+        setCartItems(savedCart);
+        setWishlist(savedWishlist);
+        return;
+      }
 
-    // Logged-in user → load from backend
-    const fetchCartAndWishlist = async () => {
       try {
-        // Load Cart
+        // Cart
         const resCart = await fetch(
           `http://localhost:5000/cart?userId=${currentUser.id}`
         );
         const cartData = await resCart.json();
-
         let newCart = getDefaultCart();
         cartData.forEach((item) => {
-          newCart[item.productId] = item.quantity;
+          if (item.productId != null) newCart[item.productId] = item.quantity;
         });
         setCartItems(newCart);
 
-        // Load Wishlist
+    
         const resWish = await fetch(
           `http://localhost:5000/wishlist?userId=${currentUser.id}`
         );
         const wishlistData = await resWish.json();
         setWishlist(wishlistData.map((w) => w.productId));
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
+      } catch (err) {
+        console.error("Failed to fetch cart/wishlist:", err);
       }
     };
 
-    fetchCartAndWishlist();
+    loadData();
   }, [currentUser]);
 
-  // ✅ Persist guest cart/wishlist to localStorage
   useEffect(() => {
     if (!currentUser) {
       localStorage.setItem("guestCart", JSON.stringify(cartItems));
@@ -68,15 +62,16 @@ const ShopProvider = ({ children }) => {
     }
   }, [cartItems, wishlist, currentUser]);
 
-  // ✅ Add to cart
+  // Add to cart
   const addToCart = async (itemId, qty = 1) => {
+    if (!itemId) return console.error("Invalid productId");
+
     if (!currentUser) {
-      // Guest → update local state only
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + qty }));
+      alert("⚠️ Please login first to add items to the cart!");
       return;
     }
 
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + qty }));
+    setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + qty }));
 
     try {
       const res = await fetch(
@@ -96,31 +91,26 @@ const ShopProvider = ({ children }) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            id: Date.now().toString() + Math.random(),
             userId: currentUser.id,
             productId: itemId,
             quantity: qty,
           }),
         });
       }
-    } catch (error) {
-      console.error("Failed to add to cart:", error);
+    } catch (err) {
+      console.error("Failed to add to cart:", err);
     }
   };
 
-  // ✅ Remove one quantity
+  // Remove one quantity
   const removeFromCart = async (itemId) => {
-    if (!currentUser) {
-      setCartItems((prev) => ({
-        ...prev,
-        [itemId]: Math.max(prev[itemId] - 1, 0),
-      }));
-      return;
-    }
-
     setCartItems((prev) => ({
       ...prev,
       [itemId]: Math.max(prev[itemId] - 1, 0),
     }));
+
+    if (!currentUser) return;
 
     try {
       const res = await fetch(
@@ -144,114 +134,90 @@ const ShopProvider = ({ children }) => {
           });
         }
       }
-    } catch (error) {
-      console.error("Failed to remove from cart:", error);
+    } catch (err) {
+      console.error("Failed to remove from cart:", err);
     }
   };
 
-  // ✅ Delete item completely
+  // Delete item completely
   const deleteFromCart = async (itemId) => {
-    if (!currentUser) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 0 }));
-      return;
-    }
-
     setCartItems((prev) => ({ ...prev, [itemId]: 0 }));
+
+    if (!currentUser) return;
 
     try {
       const res = await fetch(
         `http://localhost:5000/cart?userId=${currentUser.id}&productId=${itemId}`
       );
       const data = await res.json();
-
       if (data.length > 0) {
         await fetch(`http://localhost:5000/cart/${data[0].id}`, {
           method: "DELETE",
         });
       }
-    } catch (error) {
-      console.error("Failed to delete from cart:", error);
+    } catch (err) {
+      console.error("Failed to delete from cart:", err);
     }
   };
 
-  // ✅ Clear entire cart
+  // Clear cart
   const clearCart = async () => {
-    if (!currentUser) {
-      setCartItems(getDefaultCart());
-      return;
-    }
-
     setCartItems(getDefaultCart());
+    if (!currentUser) return;
 
     try {
       const res = await fetch(
         `http://localhost:5000/cart?userId=${currentUser.id}`
       );
       const data = await res.json();
-
       for (let item of data) {
         await fetch(`http://localhost:5000/cart/${item.id}`, {
           method: "DELETE",
         });
       }
-    } catch (error) {
-      console.error("Failed to clear cart:", error);
+    } catch (err) {
+      console.error("Failed to clear cart:", err);
     }
   };
 
-  // ✅ Wishlist functions
+  // Wishlist toggle
   const toggleWishlist = async (itemId) => {
     if (!currentUser) {
-      setWishlist((prev) =>
-        prev.includes(itemId)
-          ? prev.filter((id) => id !== itemId)
-          : [...prev, itemId]
-      );
+      alert("⚠️ Please login first to add items to the wishlist!");
       return;
     }
 
     if (wishlist.includes(itemId)) {
-      // remove
       setWishlist((prev) => prev.filter((id) => id !== itemId));
       try {
         const res = await fetch(
           `http://localhost:5000/wishlist?userId=${currentUser.id}&productId=${itemId}`
         );
         const data = await res.json();
-        if (data.length > 0) {
+        if (data.length > 0)
           await fetch(`http://localhost:5000/wishlist/${data[0].id}`, {
             method: "DELETE",
           });
-        }
-      } catch (error) {
-        console.error("Failed to remove from wishlist:", error);
+      } catch (err) {
+        console.error("Failed to remove from wishlist:", err);
       }
     } else {
-      // add
       setWishlist((prev) => [...prev, itemId]);
       try {
         await fetch("http://localhost:5000/wishlist", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: currentUser.id,
-            productId: itemId,
-          }),
+          body: JSON.stringify({ userId: currentUser.id, productId: itemId }),
         });
-      } catch (error) {
-        console.error("Failed to add to wishlist:", error);
+      } catch (err) {
+        console.error("Failed to add to wishlist:", err);
       }
     }
   };
 
-  // ✅ Apply Coupon
+  // Apply coupon
   const applyCoupon = (code) => {
-    const coupons = {
-      SAVE10: 0.1,
-      SAVE20: 0.2,
-      FLAT50: 50,
-    };
-
+    const coupons = { SAVE10: 0.1, SAVE20: 0.2, FLAT50: 50 };
     if (coupons[code]) {
       setCoupon(code);
       alert(`Coupon applied: ${code}`);
@@ -261,13 +227,9 @@ const ShopProvider = ({ children }) => {
     }
   };
 
-  // ✅ Place Order (same as before)
+  // Place order
   const placeOrder = async () => {
-    if (!currentUser) {
-      alert("Please login to place an order!");
-      return;
-    }
-
+    if (!currentUser) return alert("Please login to place an order!");
     try {
       const res = await fetch(
         `http://localhost:5000/cart?userId=${currentUser.id}`
@@ -275,25 +237,29 @@ const ShopProvider = ({ children }) => {
       const cartData = await res.json();
 
       for (let item of cartData) {
-        const product = all_product.find((p) => p.id === item.productId);
-        if (product) {
-          await fetch("http://localhost:5000/purchases", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId: currentUser.id,
-              name: currentUser.name,
-              email: currentUser.email,
-              productId: product.id,
-              productName: product.name,
-              image: product.image,
-              quantity: item.quantity,
-              price: product.new_price * item.quantity,
-              date: new Date().toISOString(),
-              status: "Pending",
-            }),
-          });
-        }
+        const product = all_product.find(
+          (p) =>
+            p.id === item.productId || Number(p.id) === Number(item.productId)
+        );
+        if (!product) continue;
+
+        await fetch("http://localhost:5000/purchases", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: currentUser.id,
+            name: currentUser.name,
+            email: currentUser.email,
+            productId: product.id,
+            productName: product.name,
+            image: product.image,
+            quantity: item.quantity,
+            price: product.new_price * item.quantity,
+            date: new Date().toISOString(),
+            status: "Pending",
+          }),
+        });
+
         await fetch(`http://localhost:5000/cart/${item.id}`, {
           method: "DELETE",
         });
@@ -301,15 +267,14 @@ const ShopProvider = ({ children }) => {
 
       setCartItems(getDefaultCart());
       alert("✅ Purchase saved successfully!");
-    } catch (error) {
-      console.error("Failed to save purchase:", error);
+    } catch (err) {
+      console.error("Failed to place order:", err);
     }
   };
 
-  // ✅ Get total cart amount with coupon applied
   const getTotalCartAmount = () => {
     let total = Object.keys(cartItems).reduce((sum, id) => {
-      const product = all_product.find((p) => p.id === Number(id));
+      const product = all_product.find((p) => Number(p.id) === Number(id));
       return sum + (product ? product.new_price * cartItems[id] : 0);
     }, 0);
 

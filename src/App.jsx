@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,7 +16,7 @@ import PaymentGateway from "./Components/PaymentGateway/PaymentGateway";
 // Admin
 import AdminLayout from "./Layout/AdminLayout";
 import AdminDashboard from "./Components/AdminPanel/AdminDashboard";
-// import ManageProducts from "./Components/AdminPanel/ManageProducts";
+import ManageProduct from "./Components/AdminPanel/ManageProducts";
 import ManageOrders from "./Components/AdminPanel/ManageOrders";
 import ManageUsers from "./Components/AdminPanel/ManageUsers";
 import ProtectedAdminRoute from "./Routes/ProtectedAdminRoute";
@@ -31,10 +32,10 @@ function App() {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
   const location = useLocation();
 
-  // Hide Navbar/Footer on admin routes
+  // ✅ Hide Navbar/Footer on admin routes
   const isAdminRoute = location.pathname.startsWith("/admin");
 
-  // Fetch products
+  // ✅ Fetch products
   useEffect(() => {
     fetch("http://localhost:5000/products")
       .then((res) => res.json())
@@ -42,7 +43,7 @@ function App() {
       .catch(() => toast.error("Failed to load products"));
   }, []);
 
-  // Sync cart
+  // ✅ Sync cart when user logs in/out
   useEffect(() => {
     if (currentUser) {
       const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
@@ -75,9 +76,9 @@ function App() {
       const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
       setCart(guestCart);
     }
-  }, [currentUser]);
+  }, []);
 
-  // Add to cart
+  // ✅ Add product to cart
   const addToCart = (product) => {
     if (currentUser) {
       const productWithUser = {
@@ -108,12 +109,14 @@ function App() {
     }
   };
 
+  // ✅ Logout
   const logout = () => {
     setCurrentUser(null);
     setCart([]);
     localStorage.removeItem("guestCart");
   };
 
+  // ✅ Shop Categories
   const categories = [
     { path: "mens", banner: men_banner, cat: "men" },
     { path: "womens", banner: women_banner, cat: "women" },
@@ -128,7 +131,7 @@ function App() {
       )}
 
       <Routes>
-        {/* Shop Routes */}
+        {/* ==== Shop Routes ==== */}
         <Route
           path="/"
           element={<Shop products={products} addToCart={addToCart} />}
@@ -161,7 +164,7 @@ function App() {
         />
         <Route path="/checkout" element={<PaymentGateway items={cart} />} />
 
-        {/* Admin Routes */}
+        {/* ==== Admin Routes ==== */}
         <Route
           path="/admin/*"
           element={
@@ -171,7 +174,10 @@ function App() {
           }
         >
           <Route path="dashboard" element={<AdminDashboard />} />
-          {/* <Route path="products" element={<ManageProducts />} /> */}
+          <Route
+            path="products"
+            element={<ManageProduct setProducts={setProducts} />}
+          />
           <Route path="orders" element={<ManageOrders />} />
           <Route path="users" element={<ManageUsers />} />
         </Route>

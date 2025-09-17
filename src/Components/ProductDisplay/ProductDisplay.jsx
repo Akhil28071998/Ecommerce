@@ -1,21 +1,36 @@
 import React, { useContext, useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import "./ProductDisplay.css";
 import star_icon from "../../assets/Assets/star_icon.png";
 import star_dull_icon from "../../assets/Assets/star_dull_icon.png";
 import { ShopContext } from "../../Context/ShopContext";
+import { ProductContext } from "../../Context/ProductContext";
 
 const ProductDisplay = (props) => {
+  const { productId } = useParams(); // Get product ID from URL
   const { product } = props;
+  const navigate = useNavigate();
+  const { allproduct } = useContext(ProductContext);
   const { addToCart } = useContext(ShopContext);
 
-  const [mainImage, setMainImage] = useState(product?.image || "");
+  // const [product, setProduct] = useState(null);
+  const [mainImage, setMainImage] = useState("");
   const [lensPos, setLensPos] = useState({ x: "50%", y: "50%" });
 
-  // useEffect(() => {
-  //   if (product?.image) {
-  //     setMainImage(product.image);
-  //   }
-  // }, [product]);
+  // Find the product by ID when allproduct loads
+  useEffect(() => {
+    if (allproduct?.length > 0 && productId) {
+      const found = allproduct.find((p) => String(p.id) === String(productId));
+      console.log("====================================");
+      console.log(found, "found");
+      console.log("====================================");
+      if (found) setMainImage(found.image || "");
+    }
+  }, [productId, allproduct]);
+
+  if (!product) {
+    return <div className="productdisplay">Loading product...</div>;
+  }
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -24,34 +39,29 @@ const ProductDisplay = (props) => {
     setLensPos({ x: `${x}%`, y: `${y}%` });
   };
 
-  if (!product) {
-    return <div className="productdisplay">Loading product...</div>;
-  }
+  const handleAddToCart = () => {
+    addToCart(product.id || product._id);
+    navigate("/cart");
+  };
 
   return (
     <div className="productdisplay">
       <div className="productdisplay-left">
         <div className="productdisplay-img-list">
-          {[product.image, product.image, product.image, product.image].map(
-            (img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={product.name}
-                onClick={() => setMainImage(img)}
-                className={mainImage === img ? "active-thumbnail" : ""}
-              />
-            )
-          )}
+          {[...Array(4)].map((_, i) => (
+            <img
+              key={i}
+              src={product.image}
+              alt={`thumb-${i}`}
+              onClick={() => setMainImage(product.image)}
+            />
+          ))}
         </div>
 
         <div
           className="productdisplay-main-img"
           onMouseMove={handleMouseMove}
-          style={{
-            "--x": lensPos.x,
-            "--y": lensPos.y,
-          }}
+          style={{ "--x": lensPos.x, "--y": lensPos.y }}
         >
           <img src={mainImage} alt={product.name} />
         </div>
@@ -71,10 +81,10 @@ const ProductDisplay = (props) => {
 
         <div className="productdisplay-right-prices">
           <div className="productdisplay-right-prices-old">
-            ${product.old_price || "0.00"}
+            ${product.offerPrice || "0.00"}
           </div>
           <div className="productdisplay-right-prices-new">
-            ${product.new_price || "0.00"}
+            ${product.price || "0.00"}
           </div>
         </div>
 
@@ -87,20 +97,14 @@ const ProductDisplay = (props) => {
           <h1>Select Size</h1>
         </div>
         <div className="productdisplay-right-size">
-          <div tabIndex={0}>S</div>
-          <div tabIndex={0}>M</div>
-          <div tabIndex={0}>L</div>
-          <div tabIndex={0}>XL</div>
-          <div tabIndex={0}>XXL</div>
+          {["S", "M", "L", "XL", "XXL"].map((size) => (
+            <div key={size} tabIndex={0}>
+              {size}
+            </div>
+          ))}
         </div>
 
-        <button
-          onClick={() => {
-            addToCart(product.id);
-          }}
-        >
-          ADD TO CART
-        </button>
+        <button onClick={handleAddToCart}>ADD TO CART</button>
 
         <p className="productdisplay-right-category">
           <span>Category :</span> {product.category || "General"}

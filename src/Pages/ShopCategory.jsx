@@ -1,11 +1,29 @@
-import React, { useContext } from "react";
+import React, { useEffect, useState } from "react";
 import "./Css/ShopCategory.css";
-import { ShopContext } from "../Context/ShopContext";
 import dropdown_icon from "../assets/Assets/dropdown_icon.png";
 import Item from "../Components/Items/Item.jsx";
+import axios from "axios";
 
 const ShopCategory = (props) => {
-  const { all_product } = useContext(ShopContext);
+  const [items, setItems] = useState([]);
+
+  // API call
+  useEffect(() => {
+    getProduct();
+  }, []); // run only once
+
+  const getProduct = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/products");
+      setItems(res.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  console.log("====================================");
+  console.log(items);
+  console.log("====================================");
 
   return (
     <div className="shop-category">
@@ -13,7 +31,7 @@ const ShopCategory = (props) => {
 
       <div className="shopcategory-indexSort">
         <p>
-          <span>Showing 1-12 </span> out of 36 products
+          <span>Showing 1-12 </span> out of {items.length} products
         </p>
         <div className="shopcategory-sort">
           sort by <img src={dropdown_icon} alt="" />
@@ -21,7 +39,7 @@ const ShopCategory = (props) => {
       </div>
 
       <div className="shopcategory-products">
-        {all_product.map((item, i) => {
+        {items?.map((item, i) => {
           if (props.category === item.category) {
             return (
               <Item
@@ -29,8 +47,8 @@ const ShopCategory = (props) => {
                 id={item.id}
                 name={item.name}
                 image={item.image}
-                new_price={item.new_price}
-                old_price={item.old_price}
+                new_price={item.offerPrice} // discounted price
+                old_price={item.price} // original price
               />
             );
           } else {
@@ -38,9 +56,7 @@ const ShopCategory = (props) => {
           }
         })}
       </div>
-      <div className="shopcategory-loadmore">
-        Explore More
-      </div>
+      <div className="shopcategory-loadmore">Explore More</div>
     </div>
   );
 };

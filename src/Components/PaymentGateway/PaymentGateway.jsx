@@ -3,6 +3,7 @@ import "./PaymentGateway.css";
 import { ShopContext } from "../../Context/ShopContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const paymentMethods = [
   {
@@ -32,6 +33,7 @@ const PaymentGateway = ({ onSuccess }) => {
 
   const [selectedOption, setSelectedOption] = useState("");
   const [step, setStep] = useState(1);
+  const navigate = useNavigate();
   const [address, setAddress] = useState({
     name: "",
     phone: "",
@@ -305,7 +307,7 @@ const PaymentGateway = ({ onSuccess }) => {
               <button
                 className="pay-btn"
                 onClick={() => {
-                  setStep(1);
+                  navigate("/");
                   toast.info("You can place another order now.");
                 }}
               >

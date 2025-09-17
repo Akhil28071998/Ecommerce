@@ -1,4 +1,3 @@
-// src/Components/AdminPanel/ManageUsers.jsx
 import React, { useEffect, useState } from "react";
 import "./ManageUsers.css";
 
@@ -72,7 +71,7 @@ const ManageUsers = () => {
                     {userPurchases.length > 0 ? (
                       <ul className="purchase-list">
                         {userPurchases.map((purchase) => (
-                          <li key={purchase.id}>
+                          <li key={purchase.id} className="purchase-item">
                             <img
                               src={purchase.image}
                               alt={purchase.productName}
@@ -80,7 +79,7 @@ const ManageUsers = () => {
                             />
                             <div className="purchase-info">
                               <strong>{purchase.productName}</strong> ×{" "}
-                              {purchase.quantity} — ₹{purchase.price}
+                              {purchase.quantity} — ${purchase.price}
                               <br />
                               <small>
                                 {purchase.date

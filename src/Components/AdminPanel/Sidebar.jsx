@@ -20,7 +20,6 @@ const Sidebar = () => {
     { path: "/admin/products", label: "Products" },
     { path: "/admin/users", label: "Users" },
     { path: "/admin/orders", label: "Orders" },
-    // { path: "/admin/ProductList", label: "ProductList" },
   ];
 
   return (
