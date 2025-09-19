@@ -21,9 +21,9 @@ const ShopCategory = (props) => {
     }
   };
 
-  console.log("====================================");
-  console.log(items);
-  console.log("====================================");
+  // console.log("====================================");
+  // console.log(items);
+  // console.log("====================================");
 
   return (
     <div className="shop-category">

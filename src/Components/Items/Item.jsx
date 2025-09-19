@@ -18,7 +18,7 @@ const Item = ({ id, image, name, new_price, old_price }) => {
       <div className="item-prices">
         <div className="item-price-new">${old_price}</div>
         <div className="item-price-old">${new_price}</div>
-        {discount > 0 && <div className="item-discount">-{discount}% OFF</div>}
+        {/* {discount > 0 && <div className="item-discount">-{discount}</div>} */}
       </div>
     </div>
   );
