@@ -1,81 +1,204 @@
-/* Admin Dashboard container */
+/* Main dashboard container adjusted for sidebar */
 .admin-dashboard {
-  margin-left: 250px; /* Same as sidebar width */
-  padding: 40px;
+  margin-left: 220px; /* space for sidebar */
+  padding: 2rem;
+  background: #f4f6f9;
   min-height: 100vh;
-  background-color: #f3f4f6; /* Light gray */
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
   transition: margin-left 0.3s ease;
 }
 
-/* Header */
+/* Header - Centered */
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
 .dashboard-header h1 {
-  font-size: 2.2rem;
-  color: #111827; /* Dark gray */
-  margin-bottom: 5px;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.4rem;
 }
 
 .dashboard-header p {
+  color: #7f8c8d;
   font-size: 1rem;
-  color: #6b7280; /* Gray text */
-  margin-bottom: 30px;
 }
 
-/* Cards container */
+/* Info cards */
 .dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* aligned with sidebar */
+}
+.card {
+  flex: 1;
+  min-width: 180px;
+  max-width: 250px;
+  background: linear-gradient(135deg, #70bafa, #5ce4eb); /* blue gradient */
+  padding: 1.8rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  color: #fff; /* white text for contrast */
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
 }
 
-/* Individual card */
-.dashboard-card {
-  background-color: #ffffff;
-  padding: 25px 20px;
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Alternate card style */
+.card.alt {
+  background: linear-gradient(
+    135deg,
+    #ff9a9e,
+    #fecfef
+  ); /* elegant pink gradient */
+}
+
+.card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.card h2 {
+  font-size: 1.6rem;
+  margin: 0.4rem 0;
+  font-weight: bold;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+/* Custom card accents */
+.weekly-sales h2 {
+  color: #27ae60;
+}
+.weekly-orders h2 {
+  color: #e74c3c;
+}
+.visitors-online h2 {
+  color: #3498db;
+}
+
+/* Charts section */
+.dashboard-charts {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  justify-content: flex-start; /* aligned with sidebar */
+}
+
+.chart {
+  flex: 1;
+  min-width: 300px;
+  max-width: 500px;
+  background: #fff;
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.chart h3 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* Links */
+.dashboard-links {
+  display: flex;
+  justify-content: flex-start; /* aligned with sidebar */
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-link {
+  padding: 0.8rem 1.5rem;
+  background: #3498db;
+  color: #fff;
+  border-radius: 8px;
   text-decoration: none;
-  color: #111827;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.dashboard-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Card content */
-.dashboard-card h2 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 1.5rem;
-}
-
-.dashboard-card p {
-  margin: 0;
   font-size: 0.95rem;
-  color: #6b7280;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.dashboard-link:hover {
+  background: #2980b9;
+}
+
+.dashboard-transactions {
+  margin-top: 2rem;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  overflow-x: auto;
+}
+
+.dashboard-transactions table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard-transactions th,
+.dashboard-transactions td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.dashboard-transactions th {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.dashboard-transactions td {
+  color: #555;
 }
 
 /* Responsive adjustments */
-@media (max-width: 1024px) {
+@media (max-width: 992px) {
   .admin-dashboard {
-    margin-left: 200px; /* Adjust for smaller sidebar */
-    padding: 30px;
+    margin-left: 60px; /* collapsed sidebar */
   }
 }
 
 @media (max-width: 768px) {
   .admin-dashboard {
-    margin-left: 0; /* Sidebar collapses or stacks */
-    padding: 20px;
-  }
-
-  .dashboard-header h1 {
-    font-size: 1.8rem;
+    margin-left: 0;
+    padding: 1rem;
   }
 
   .dashboard-cards {
-    gap: 15px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .dashboard-charts {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .chart {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .dashboard-links {
+    justify-content: center;
   }
 }

@@ -197,9 +197,9 @@ const ProductManagement = () => {
           required
         >
           <option value="">Select Category</option>
-          <option value="Men">Men</option>
-          <option value="Women">Women</option>
-          <option value="Kids">Kids</option>
+          <option value="men">Men</option>
+          <option value="women">Women</option>
+          <option value="kids">Kids</option>
         </select>
 
         <input

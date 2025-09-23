@@ -32,10 +32,10 @@ function App() {
   const { currentUser, setCurrentUser } = useContext(AuthContext);
   const location = useLocation();
 
-  // ✅ Hide Navbar/Footer on admin routes
+  // Hide Navbar/Footer on admin routes
   const isAdminRoute = location.pathname.startsWith("/admin");
 
-  // ✅ Fetch products
+  // Fetch products
   useEffect(() => {
     fetch("http://localhost:5000/products")
       .then((res) => res.json())
@@ -43,15 +43,20 @@ function App() {
       .catch(() => toast.error("Failed to load products"));
   }, []);
 
-  // ✅ Sync cart when user logs in/out
+  // Sync cart when user logs in/out
   useEffect(() => {
-    if (currentUser) {
-      const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
-      fetch(`http://localhost:5000/cart?userId=${currentUser.id}`)
-        .then((res) => res.json())
-        .then(async (data) => {
+    const syncCart = async () => {
+      if (currentUser) {
+        const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
+        try {
+          const res = await fetch(
+            `http://localhost:5000/cart?userId=${currentUser.id}`
+          );
+          const userCart = await res.json();
+
+          // Add guest items to user cart
           for (let item of guestCart) {
-            const exists = data.find((i) => i.productId === item.id);
+            const exists = userCart.find((i) => i.productId === item.id);
             if (!exists) {
               await fetch("http://localhost:5000/cart", {
                 method: "POST",
@@ -64,42 +69,49 @@ function App() {
               });
             }
           }
+
           localStorage.removeItem("guestCart");
+
           const res2 = await fetch(
             `http://localhost:5000/cart?userId=${currentUser.id}`
           );
           const updatedCart = await res2.json();
           setCart(updatedCart);
-        })
-        .catch(() => toast.error("Failed to load cart"));
-    } else {
-      const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
-      setCart(guestCart);
-    }
-  }, []);
+        } catch (error) {
+          toast.error("Failed to load cart");
+        }
+      } else {
+        const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
+        setCart(guestCart);
+      }
+    };
 
-  // ✅ Add product to cart
-  const addToCart = (product) => {
+    syncCart();
+  }, [currentUser]); // dependency added so it re-runs on login/logout
+
+  // Add product to cart
+  const addToCart = async (product) => {
     if (currentUser) {
       const productWithUser = {
         ...product,
         userId: currentUser.id,
         productId: product.id,
       };
-      fetch("http://localhost:5000/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(productWithUser),
-      })
-        .then(() =>
-          fetch(`http://localhost:5000/cart?userId=${currentUser.id}`)
-        )
-        .then((res) => res.json())
-        .then((data) => {
-          setCart(data);
-          toast.success(`${product.name} added to cart!`);
-        })
-        .catch(() => toast.error("Failed to add product to cart"));
+      try {
+        await fetch("http://localhost:5000/cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(productWithUser),
+        });
+        const res = await fetch(
+          `http://localhost:5000/cart?userId=${currentUser.id}`
+        );
+        const data = await res.json();
+        setCart(data);
+        toast.success(`${product.name} added to cart!`);
+      } catch (error) {
+        toast.error("Failed to add product to cart");
+      }
     } else {
       let guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
       guestCart.push(product);
@@ -109,14 +121,14 @@ function App() {
     }
   };
 
-  // ✅ Logout
+  // Logout
   const logout = () => {
     setCurrentUser(null);
     setCart([]);
     localStorage.removeItem("guestCart");
   };
 
-  // ✅ Shop Categories
+  // Shop Categories
   const categories = [
     { path: "mens", banner: men_banner, cat: "men" },
     { path: "womens", banner: women_banner, cat: "women" },
@@ -131,7 +143,7 @@ function App() {
       )}
 
       <Routes>
-        {/* ==== Shop Routes ==== */}
+        {/* Shop Routes */}
         <Route
           path="/"
           element={<Shop products={products} addToCart={addToCart} />}
@@ -164,7 +176,7 @@ function App() {
         />
         <Route path="/checkout" element={<PaymentGateway items={cart} />} />
 
-        {/* ==== Admin Routes ==== */}
+        {/* Admin Routes */}
         <Route
           path="/admin/*"
           element={

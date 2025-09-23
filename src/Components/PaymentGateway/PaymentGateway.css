@@ -1,143 +1,156 @@
-PaymentGateway.css .pg-amazon-bg {
+/* PaymentGateway.css */
+
+/* 🌟 Background */
+.pg-amazon-bg {
+  background: #f5f5f5;
   min-height: 100vh;
-  background: #f3f3f3;
-  padding: 40px 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* 🌟 Container */
 .pg-amazon-container {
   display: flex;
-  max-width: 1100px;
-  margin: auto;
+  max-width: 1200px;
+  margin: 0 auto;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
+/* 🌟 Sidebar */
 .pg-amazon-sidebar {
-  width: 240px;
-  background: #fafafa;
-  border-right: 1px solid #eee;
+  width: 220px;
+  background: #232f3e;
+  color: #fff;
   padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .pg-step {
-  padding: 14px 12px;
-  margin-bottom: 12px;
+  padding: 12px 16px;
   border-radius: 8px;
+  background: #37475a;
   font-weight: 500;
-  color: #555;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .pg-step.active {
-  background: #0073e6;
-  color: #fff;
-  font-weight: 600;
+  background: #f0c14b;
+  color: #111;
+  font-weight: 700;
+  transform: scale(1.05);
 }
 
+/* 🌟 Main section */
 .pg-amazon-main {
   flex: 1;
-  padding: 40px;
+  padding: 30px 40px;
 }
 
-.pg-section {
-  background: #fff;
-  padding: 25px 30px;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-}
-
+/* Section Titles */
 .pg-title {
-  font-size: 1.4rem;
-  margin-bottom: 20px;
-  color: #333;
+  font-size: 24px;
   font-weight: 600;
+  margin-bottom: 20px;
+  color: #111;
 }
 
-.pg-address-form {
-  display: grid;
-  gap: 14px;
-}
-
+/* 🌟 Address Form */
 .pg-address-form input {
-  padding: 12px 14px;
-  border: 1px solid #ddd;
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 12px;
   border-radius: 8px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s ease;
-}
-
-.pg-address-form input:focus {
-  border-color: #0073e6;
-  outline: none;
+  border: 1px solid #ccc;
+  font-size: 16px;
 }
 
 .pg-address-card {
-  background: #fafafa;
-  border: 1px solid #e3e3e3;
-  padding: 18px 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
   line-height: 1.6;
-  font-size: 0.95rem;
 }
 
+/* 🌟 Navigation Buttons */
+.pg-nav-btns {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.pay-btn {
+  background: #f0c14b;
+  color: #111;
+  padding: 10px 22px;
+  border: 1px solid #a88734;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.pay-btn:hover {
+  background: #ddb347;
+}
+
+/* 🌟 Order Summary */
 .pg-order-card {
-  border: 1px solid #e3e3e3;
-  border-radius: 10px;
-  padding: 18px 20px;
-  background: #fafafa;
-  margin-bottom: 20px;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
 }
 
 .pg-order-item {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 0.95rem;
-  color: #444;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.pg-order-item:last-child {
+  border-bottom: none;
 }
 
 .pg-order-total {
   display: flex;
   justify-content: space-between;
-  font-size: 1rem;
-  margin-top: 14px;
-  border-top: 1px solid #ddd;
   padding-top: 12px;
+  font-size: 18px;
   font-weight: 600;
-  color: #222;
 }
 
+/* 🌟 Payment Methods */
 .pg-methods {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .pg-method {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 12px 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.pg-method:hover {
-  border-color: #0073e6;
-  box-shadow: 0 4px 10px rgba(0, 115, 230, 0.1);
+  flex: 1 1 200px;
 }
 
 .pg-method.selected {
-  border-color: #0073e6;
-  background: #f0f7ff;
-  box-shadow: 0 6px 12px rgba(0, 115, 230, 0.15);
+  border-color: #f0c14b;
+  background: #fff8dc;
 }
 
 .pg-method input {
@@ -145,68 +158,61 @@ PaymentGateway.css .pg-amazon-bg {
 }
 
 .pg-icon {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
+  width: 40px;
+  height: 40px;
 }
 
 .pg-label {
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 500;
-  color: #333;
 }
 
-
-.pg-nav-btns {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
+/* 🌟 Payment Details Section */
+.pg-payment-details {
+  margin-bottom: 20px;
 }
 
-.pay-btn {
-  padding: 12px 20px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  background: linear-gradient(135deg, #0073e6, #005bb5);
-  color: #fff;
-  border: none;
+.pg-payment-details h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #111;
+}
+
+.pg-payment-details input,
+.pg-payment-details select {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 12px;
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.pay-btn:hover {
-  background: linear-gradient(135deg, #005bb5, #004499);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 12px rgba(0, 115, 230, 0.25);
-}
-
-.pay-btn:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.pg-method-details {
-  margin-top: 20px;
-  padding: 18px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background: #f9f9f9;
-  font-size: 0.95rem;
-  color: #444;
-}
-
-.pg-credit-form,
-.pg-upi-form {
-  display: grid;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.pg-credit-form input,
-.pg-upi-form input {
-  padding: 12px;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 16px;
+}
+
+/* 🌟 Success Section */
+.pg-success {
+  text-align: center;
+}
+
+.pg-success p {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+/* 🌟 Responsive */
+@media (max-width: 900px) {
+  .pg-amazon-container {
+    flex-direction: column;
+  }
+
+  .pg-amazon-sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .pg-step {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+  }
 }

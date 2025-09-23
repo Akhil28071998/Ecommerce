@@ -6,31 +6,22 @@ import star_dull_icon from "../../assets/Assets/star_dull_icon.png";
 import { ShopContext } from "../../Context/ShopContext";
 import { ProductContext } from "../../Context/ProductContext";
 
-const ProductDisplay = (props) => {
-  const { productId } = useParams(); // Get product ID from URL
-  const { product } = props;
+const ProductDisplay = () => {
+  const { productId } = useParams();
   const navigate = useNavigate();
   const { allproduct } = useContext(ProductContext);
   const { addToCart } = useContext(ShopContext);
 
-  // const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
   const [lensPos, setLensPos] = useState({ x: "50%", y: "50%" });
 
-  // Find the product by ID when allproduct loads
-  useEffect(() => {
-    if (allproduct?.length > 0 && productId) {
-      const found = allproduct.find((p) => String(p.id) === String(productId));
-      console.log("====================================");
-      console.log(found, "found");
-      console.log("====================================");
-      if (found) setMainImage(found.image || "");
-    }
-  }, [productId, allproduct]);
+  const product = allproduct?.find((p) => String(p.id) === String(productId));
 
-  if (!product) {
-    return <div className="productdisplay">Loading product...</div>;
-  }
+  useEffect(() => {
+    if (product) setMainImage(product.image || "");
+  }, [product]);
+
+  if (!product) return <div className="productdisplay">Loading product...</div>;
 
   const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -40,7 +31,7 @@ const ProductDisplay = (props) => {
   };
 
   const handleAddToCart = () => {
-    addToCart(product.id || product._id);
+    addToCart(product.id); // pass product.id
     navigate("/cart");
   };
 
@@ -48,14 +39,18 @@ const ProductDisplay = (props) => {
     <div className="productdisplay">
       <div className="productdisplay-left">
         <div className="productdisplay-img-list">
-          {[...Array(4)].map((_, i) => (
-            <img
-              key={i}
-              src={product.image}
-              alt={`thumb-${i}`}
-              onClick={() => setMainImage(product.image)}
-            />
-          ))}
+          {product.image &&
+            [...Array(4)].map((_, i) => (
+              <img
+                key={`${product.id}-${i}`}
+                src={product.image}
+                alt={`thumb-${i}`}
+                className={
+                  mainImage === product.image ? "active-thumbnail" : ""
+                }
+                onClick={() => setMainImage(product.image)}
+              />
+            ))}
         </div>
 
         <div
@@ -63,7 +58,7 @@ const ProductDisplay = (props) => {
           onMouseMove={handleMouseMove}
           style={{ "--x": lensPos.x, "--y": lensPos.y }}
         >
-          <img src={mainImage} alt={product.name} />
+          {mainImage && <img src={mainImage} alt={product.name} />}
         </div>
       </div>
 
@@ -95,10 +90,8 @@ const ProductDisplay = (props) => {
 
         <div className="productdisplay-right-size">
           <h1>Select Size</h1>
-        </div>
-        <div className="productdisplay-right-size">
           {["S", "M", "L", "XL", "XXL"].map((size) => (
-            <div key={size} tabIndex={0}>
+            <div key={`${product.id}-size-${size}`} tabIndex={0}>
               {size}
             </div>
           ))}
@@ -111,7 +104,9 @@ const ProductDisplay = (props) => {
         </p>
         <p className="productdisplay-right-category">
           <span>Tags:</span>{" "}
-          {product.tags?.length ? product.tags.join(", ") : "None"}
+          {product.tags?.map((tag, index) => (
+            <span key={`${product.id}-tag-${index}`}>{tag} </span>
+          )) || "None"}
         </p>
       </div>
     </div>

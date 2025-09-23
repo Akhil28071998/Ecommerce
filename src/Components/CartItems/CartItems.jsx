@@ -18,6 +18,9 @@ const CartItems = () => {
   const navigate = useNavigate();
   const cartDetails = getCartDetails();
   const [couponCode, setCouponCode] = useState("");
+  // console.log("====================================");
+  // console.log(cartDetails);
+  // console.log("====================================");
 
   // 🛒 Checkout handler
   const handleCheckout = () => {
@@ -49,7 +52,7 @@ const CartItems = () => {
             <div className="cartitems-format">
               <img src={item.image} alt="" className="carticon-product-icon" />
               <p>{item.name}</p>
-              <p>${item.price}</p>
+              <p>${item.oldPrice}</p>
 
               <div className="cartitems-quantity-controls">
                 <button onClick={() => removeFromCart(item.id)}>-</button>
@@ -57,7 +60,8 @@ const CartItems = () => {
                 <button onClick={() => addToCart(item.id)}>+</button>
               </div>
 
-              <p>${item.price * item.qty}</p>
+              {/* <p>${item.price * item.qty}</p> */}
+              <p>${item.oldPrice * item.qty}</p>
               <img
                 src={remove_icon}
                 onClick={() => deleteFromCart(item.id)}

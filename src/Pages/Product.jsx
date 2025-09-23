@@ -1,6 +1,6 @@
+import Breadcrums from "../Components/Breadcrums/Breadcrums";
 import React, { useContext } from "react";
 import ProductDisplay from "../Components/ProductDisplay/ProductDisplay";
-import Breadcrums from "../Components/Breadcrums/Breadcrums";
 import { ShopContext } from "../Context/ShopContext";
 import { useParams } from "react-router-dom";
 import DescriptionBox from "../Components/DescriptionBox/DescriptionBox";
@@ -10,7 +10,17 @@ import { ProductContext } from "../Context/ProductContext";
 const Product = () => {
   const { allproduct } = useContext(ProductContext);
   const { productId } = useParams();
-  const product = allproduct.find((e) => e.id == productId);
+
+  // Wait until allproduct is loaded
+  if (!allproduct || allproduct.length === 0) {
+    return <div>Loading product...</div>;
+  }
+
+  const product = allproduct.find((e) => String(e.id) === String(productId));
+
+  if (!product) {
+    return <div>Product not found.</div>;
+  }
 
   return (
     <div>
@@ -21,5 +31,4 @@ const Product = () => {
     </div>
   );
 };
-
-export default Product;
+export default ProductDisplay;

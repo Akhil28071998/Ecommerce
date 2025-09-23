@@ -10,38 +10,41 @@ const ManageUsers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userRes, purchaseRes] = await Promise.all([
+        const [usersRes, purchasesRes] = await Promise.all([
           fetch("http://localhost:5000/users"),
           fetch("http://localhost:5000/purchases"),
         ]);
 
-        if (!userRes.ok) throw new Error("Failed to fetch users");
-        if (!purchaseRes.ok) throw new Error("Failed to fetch purchases");
+        if (!usersRes.ok) throw new Error("Failed to fetch users");
+        if (!purchasesRes.ok) throw new Error("Failed to fetch purchases");
 
         const [usersData, purchasesData] = await Promise.all([
-          userRes.json(),
-          purchaseRes.json(),
+          usersRes.json(),
+          purchasesRes.json(),
         ]);
 
         setUsers(usersData);
         setPurchases(purchasesData);
       } catch (err) {
-        console.error("Error fetching data:", err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
+  if (loading) return <p className="status-msg">Loading users...</p>;
+  if (error) return <p className="status-msg error">Error: {error}</p>;
+  if (!users.length && !purchases.length)
+    return <p className="status-msg">No data found</p>;
+
+  // Registered users purchases
   const getUserPurchases = (userId) =>
     purchases.filter((p) => String(p.userId) === String(userId));
 
-  if (loading) return <p className="status-msg">Loading users...</p>;
-  if (error) return <p className="status-msg error">Error: {error}</p>;
-  if (users.length === 0) return <p className="status-msg">No users found</p>;
+  // Guest purchases
+  const guestPurchases = purchases.filter((p) => p.userId === "guest");
 
   return (
     <div className="manage-users">
@@ -51,54 +54,60 @@ const ManageUsers = () => {
         <table className="users-table">
           <thead>
             <tr>
-              <th>User Id</th>
               <th>User Name</th>
               <th>Email</th>
-              <th>Role</th>
               <th>Purchases</th>
             </tr>
           </thead>
           <tbody>
+            {/* Registered Users */}
             {users.map((user) => {
               const userPurchases = getUserPurchases(user.id);
               return (
                 <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.name || "N/A"}</td>
-                  <td>{user.email || "N/A"}</td>
-                  <td className="role">{user.role || "user"}</td>
+                  <td>{user.name}</td>
+                  <td>{user.email || "N/A"}</td> {/* Always use users email */}
                   <td>
-                    {userPurchases.length > 0 ? (
-                      <ul className="purchase-list">
-                        {userPurchases.map((purchase) => (
-                          <li key={purchase.id} className="purchase-item">
-                            <img
-                              src={purchase.image}
-                              alt={purchase.productName}
-                              className="purchase-img"
-                            />
-                            <div className="purchase-info">
-                              <strong>{purchase.productName}</strong> ×{" "}
-                              {purchase.quantity} — ${purchase.price}
-                              <br />
-                              <small>
-                                {purchase.date
-                                  ? new Date(purchase.date).toLocaleString(
-                                      "en-IN"
-                                    )
-                                  : "Date not available"}
-                              </small>
-                            </div>
+                    {userPurchases.length ? (
+                      <ul>
+                        {userPurchases.map((p) => (
+                          <li key={p.id}>
+                            <img src={p.image} alt={p.productName} width="50" />
+                            {p.productName} × {p.quantity} — ${p.price}
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <span className="no-purchase">No purchases yet</span>
+                      <span>No purchases yet</span>
                     )}
                   </td>
                 </tr>
               );
             })}
+
+            {/* Guest Purchases */}
+            {guestPurchases.length > 0 && (
+              <>
+                <tr>
+                  <td
+                    colSpan="3"
+                    style={{ fontWeight: "bold", textAlign: "center" }}
+                  >
+                    Guest Purchases
+                  </td>
+                </tr>
+                {guestPurchases.map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.name || "Guest User"}</td>
+                    <td>{p.email || "N/A"}</td>
+                    <td>
+                      <img src={p.image} alt={p.productName} width="50" />{" "}
+                      {p.productName} × {p.quantity} — ${p.price}
+                    </td>
+                  </tr>
+                ))}
+              </>
+            )}
           </tbody>
         </table>
       </div>

@@ -3,7 +3,7 @@ import "./PaymentGateway.css";
 import { ShopContext } from "../../Context/ShopContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const paymentMethods = [
   {
@@ -29,14 +29,15 @@ const paymentMethods = [
 ];
 
 const PaymentGateway = ({ onSuccess }) => {
-  const { getCartDetails, getTotalCartAmount } = useContext(ShopContext);
-
+  const { getCartDetails, getTotalCartAmount, currentUser } =
+    useContext(ShopContext);
   const [selectedOption, setSelectedOption] = useState("");
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
   const [address, setAddress] = useState({
     name: "",
     phone: "",
+    email: "",
     address: "",
     city: "",
     state: "",
@@ -46,14 +47,14 @@ const PaymentGateway = ({ onSuccess }) => {
   const [orderTotal, setOrderTotal] = useState(0);
   const [items, setItems] = useState([]);
 
-  // ✅ Load items from cart context
+  // Load cart items
   useEffect(() => {
     const cartItems = getCartDetails();
     setItems(cartItems);
     setOrderTotal(getTotalCartAmount());
   }, [getCartDetails, getTotalCartAmount]);
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (!selectedOption) {
       toast.error("⚠️ Please select a payment option.");
       return;
@@ -61,27 +62,53 @@ const PaymentGateway = ({ onSuccess }) => {
 
     toast.info("Processing payment...");
 
-    setTimeout(() => {
-      setStep(4);
-      toast.success("🎉 Payment Successful! Order placed.");
+    setTimeout(async () => {
+      try {
+        const orders = items.map((item) => ({
+          userId: currentUser?.id || "guest",
+          name: address.name,
+          email: currentUser?.email || address.email || "guest@example.com",
+          mobile: address.phone,
+          address: `${address.address}, ${address.city}, ${address.state} - ${address.pincode}`,
+          productId: item.id,
+          productName: item.name,
+          image: item.image,
+          quantity: item.qty,
+          price: item.price,
+          date: new Date().toISOString(),
+          status: "Completed",
+        }));
 
-      if (onSuccess) {
-        onSuccess({
-          paymentId: "demo123",
-          amount: orderTotal,
-          method: selectedOption,
-        });
+        await Promise.all(
+          orders.map((order) =>
+            fetch("http://localhost:5000/purchases", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(order),
+            })
+          )
+        );
+
+        toast.success("🎉 Payment Successful! Order placed.");
+        setStep(4);
+
+        if (onSuccess)
+          onSuccess({
+            paymentId: "demo123",
+            amount: orderTotal,
+            method: selectedOption,
+          });
+      } catch (err) {
+        console.error(err);
+        toast.error("❌ Failed to place order.");
       }
     }, 1500);
   };
 
   return (
     <div className="pg-amazon-bg">
-      {/* Toast Container */}
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-
       <div className="pg-amazon-container">
-        {/* Sidebar Steps */}
         <div className="pg-amazon-sidebar">
           <div className={`pg-step${step === 1 ? " active" : ""}`}>
             1. Address
@@ -97,7 +124,6 @@ const PaymentGateway = ({ onSuccess }) => {
           </div>
         </div>
 
-        {/* Main Steps */}
         <div className="pg-amazon-main">
           {/* Step 1: Address */}
           {step === 1 && (
@@ -115,17 +141,30 @@ const PaymentGateway = ({ onSuccess }) => {
                   <input
                     type="text"
                     placeholder="Full Name"
-                    value={address.name}
                     required
+                    value={address.name}
                     onChange={(e) =>
                       setAddress({ ...address, name: e.target.value })
                     }
                   />
+
+                  {!currentUser && (
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      required
+                      value={address.email}
+                      onChange={(e) =>
+                        setAddress({ ...address, email: e.target.value })
+                      }
+                    />
+                  )}
+
                   <input
                     type="text"
                     placeholder="Phone Number"
-                    value={address.phone}
                     required
+                    value={address.phone}
                     onChange={(e) =>
                       setAddress({ ...address, phone: e.target.value })
                     }
@@ -133,8 +172,8 @@ const PaymentGateway = ({ onSuccess }) => {
                   <input
                     type="text"
                     placeholder="Address Line"
-                    value={address.address}
                     required
+                    value={address.address}
                     onChange={(e) =>
                       setAddress({ ...address, address: e.target.value })
                     }
@@ -142,8 +181,8 @@ const PaymentGateway = ({ onSuccess }) => {
                   <input
                     type="text"
                     placeholder="City"
-                    value={address.city}
                     required
+                    value={address.city}
                     onChange={(e) =>
                       setAddress({ ...address, city: e.target.value })
                     }
@@ -151,8 +190,8 @@ const PaymentGateway = ({ onSuccess }) => {
                   <input
                     type="text"
                     placeholder="State"
-                    value={address.state}
                     required
+                    value={address.state}
                     onChange={(e) =>
                       setAddress({ ...address, state: e.target.value })
                     }
@@ -160,8 +199,8 @@ const PaymentGateway = ({ onSuccess }) => {
                   <input
                     type="text"
                     placeholder="Pincode"
-                    value={address.pincode}
                     required
+                    value={address.pincode}
                     onChange={(e) =>
                       setAddress({ ...address, pincode: e.target.value })
                     }
@@ -194,7 +233,7 @@ const PaymentGateway = ({ onSuccess }) => {
                       style={{ marginLeft: "16px" }}
                       onClick={() => {
                         setAddressSaved(false);
-                        toast.info("✏️ Address edit mode enabled.");
+                        toast.info("✏️ Edit mode enabled.");
                       }}
                     >
                       Edit
@@ -210,21 +249,16 @@ const PaymentGateway = ({ onSuccess }) => {
             <div className="pg-section">
               <h2 className="pg-title">Order Summary</h2>
               <div className="pg-order-card">
-                {items.length > 0 ? (
-                  items.map((item) => (
-                    <div key={item.id} className="pg-order-item">
-                      <span>
-                        {item.name} (x{item.qty})
-                      </span>
-                      <span>${item.price * item.qty}</span>
-                    </div>
-                  ))
-                ) : (
-                  <div>No items in the order.</div>
-                )}
+                {items.map((item) => (
+                  <div key={item.id} className="pg-order-item">
+                    <span>
+                      {item.name} (x{item.qty})
+                    </span>
+                    <span>${item.price * item.qty}</span>
+                  </div>
+                ))}
                 <div className="pg-order-total">
-                  <strong>Total:</strong>
-                  <strong>${orderTotal}</strong>
+                  <strong>Total:</strong> <strong>${orderTotal}</strong>
                 </div>
               </div>
               <div className="pg-nav-btns">
@@ -235,13 +269,7 @@ const PaymentGateway = ({ onSuccess }) => {
                 >
                   Back
                 </button>
-                <button
-                  className="pay-btn"
-                  onClick={() => {
-                    setStep(3);
-                    toast.info("Proceeding to payment...");
-                  }}
-                >
+                <button className="pay-btn" onClick={() => setStep(3)}>
                   Proceed to Payment
                 </button>
               </div>
@@ -275,6 +303,46 @@ const PaymentGateway = ({ onSuccess }) => {
                     <span className="pg-label">{method.label}</span>
                   </label>
                 ))}
+              </div>
+
+              <div className="pg-payment-details">
+                {selectedOption === "paypal" && (
+                  <div className="pg-paypal">
+                    <h3>Pay via PayPal</h3>
+                    <p>You will be redirected to PayPal to complete payment.</p>
+                  </div>
+                )}
+                {selectedOption === "creditcard" && (
+                  <div className="pg-credit">
+                    <h3>Enter Credit Card Details</h3>
+                    <input type="text" placeholder="Card Number" required />
+                    <input
+                      type="text"
+                      placeholder="Card Holder Name"
+                      required
+                    />
+                    <input type="text" placeholder="MM/YY" required />
+                    <input type="password" placeholder="CVV" required />
+                  </div>
+                )}
+                {selectedOption === "netbanking" && (
+                  <div className="pg-netbanking">
+                    <h3>Select Your Bank</h3>
+                    <select>
+                      <option value="">--Choose Bank--</option>
+                      <option value="sbi">SBI</option>
+                      <option value="hdfc">HDFC</option>
+                      <option value="icici">ICICI</option>
+                      <option value="axis">Axis</option>
+                    </select>
+                  </div>
+                )}
+                {selectedOption === "cod" && (
+                  <div className="pg-cod">
+                    <h3>Cash on Delivery</h3>
+                    <p>Pay cash on delivery.</p>
+                  </div>
+                )}
               </div>
 
               <div className="pg-nav-btns">

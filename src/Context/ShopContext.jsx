@@ -14,6 +14,7 @@ const ShopProvider = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState(getDefaultCart());
   const [wishlist, setWishlist] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [coupon, setCoupon] = useState(null);
 
   // Load cart & wishlist
@@ -41,7 +42,7 @@ const ShopProvider = ({ children }) => {
         });
         setCartItems(newCart);
 
-    
+        // Wishlist
         const resWish = await fetch(
           `http://localhost:5000/wishlist?userId=${currentUser.id}`
         );
@@ -55,12 +56,27 @@ const ShopProvider = ({ children }) => {
     loadData();
   }, [currentUser]);
 
+  // Save for guests
   useEffect(() => {
     if (!currentUser) {
       localStorage.setItem("guestCart", JSON.stringify(cartItems));
       localStorage.setItem("guestWishlist", JSON.stringify(wishlist));
     }
   }, [cartItems, wishlist, currentUser]);
+
+  // Fetch products from backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/products");
+        const data = await res.json();
+        setAllProducts(data);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   // Add to cart
   const addToCart = async (itemId, qty = 1) => {
@@ -237,11 +253,13 @@ const ShopProvider = ({ children }) => {
       const cartData = await res.json();
 
       for (let item of cartData) {
-        const product = all_product.find(
-          (p) =>
-            p.id === item.productId || Number(p.id) === Number(item.productId)
-        );
+        const product =
+          all_product.find((p) => String(p.id) === String(item.productId)) ||
+          allProducts.find((p) => String(p.id) === String(item.productId));
         if (!product) continue;
+
+        const offerPrice =
+          product.new_price ?? product.offerPrice ?? product.price ?? 0;
 
         await fetch("http://localhost:5000/purchases", {
           method: "POST",
@@ -254,7 +272,7 @@ const ShopProvider = ({ children }) => {
             productName: product.name,
             image: product.image,
             quantity: item.quantity,
-            price: product.new_price * item.quantity,
+            price: offerPrice * item.quantity,
             date: new Date().toISOString(),
             status: "Pending",
           }),
@@ -272,10 +290,18 @@ const ShopProvider = ({ children }) => {
     }
   };
 
+  // Total cart amount
   const getTotalCartAmount = () => {
     let total = Object.keys(cartItems).reduce((sum, id) => {
-      const product = all_product.find((p) => Number(p.id) === Number(id));
-      return sum + (product ? product.new_price * cartItems[id] : 0);
+      const product =
+        all_product.find((p) => String(p.id) === String(id)) ||
+        allProducts.find((p) => String(p.id) === String(id));
+
+      if (!product) return sum;
+
+      const offerPrice =
+        product.new_price ?? product.offerPrice ?? product.price ?? 0;
+      return sum + offerPrice * cartItems[id];
     }, 0);
 
     if (coupon === "SAVE10") return total * 0.9;
@@ -284,24 +310,34 @@ const ShopProvider = ({ children }) => {
     return total;
   };
 
+  // Total items
   const getTotalCartItems = () =>
     Object.values(cartItems).reduce((sum, qty) => sum + qty, 0);
 
-  const getCartDetails = () =>
-    all_product
+  // Cart details with oldPrice for display
+  const getCartDetails = () => {
+    const source = allProducts.length > 0 ? allProducts : all_product;
+
+    return source
       .filter((p) => cartItems[p.id] > 0)
-      .map((p) => ({
-        id: p.id,
-        name: p.name,
-        price: p.new_price,
-        qty: cartItems[p.id],
-        image: p.image,
-      }));
+      .map((p) => {
+        const offerPrice = p.new_price ?? p.offerPrice ?? p.price ?? 0;
+        return {
+          id: p.id,
+          name: p.name,
+          price: offerPrice, // used for totals
+          oldPrice: p.price, // used for strikethrough display
+          qty: cartItems[p.id],
+          image: p.image,
+        };
+      });
+  };
 
   return (
     <ShopContext.Provider
       value={{
         all_product,
+        allProducts,
         cartItems,
         wishlist,
         coupon,
