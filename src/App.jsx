@@ -78,7 +78,7 @@ function App() {
           const updatedCart = await res2.json();
           setCart(updatedCart);
         } catch (error) {
-          toast.error("Failed to load cart");
+          console.error("Failed to load cart"); // ✅ Only log, no toast
         }
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
@@ -87,7 +87,7 @@ function App() {
     };
 
     syncCart();
-  }, [currentUser]); // dependency added so it re-runs on login/logout
+  }, [currentUser]);
 
   // Add product to cart
   const addToCart = async (product) => {
