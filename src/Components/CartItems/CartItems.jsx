@@ -1,4 +1,3 @@
-// src/Components/CartItems/CartItems.jsx
 import React, { useContext, useState } from "react";
 import "./CartItems.css";
 import { ShopContext } from "../../Context/ShopContext";
@@ -12,24 +11,18 @@ const CartItems = () => {
     removeFromCart,
     deleteFromCart,
     getTotalCartAmount,
-    applyCoupon,
+    setCoupon,
   } = useContext(ShopContext);
 
   const navigate = useNavigate();
   const cartDetails = getCartDetails();
   const [couponCode, setCouponCode] = useState("");
-  // console.log("====================================");
-  // console.log(cartDetails);
-  // console.log("====================================");
 
-  // 🛒 Checkout handler
-  const handleCheckout = () => {
-    navigate("/checkout");
-  };
+  const handleCheckout = () => navigate("/checkout");
 
   const handleApplyCoupon = () => {
     if (couponCode.trim()) {
-      applyCoupon(couponCode.trim().toUpperCase());
+      setCoupon(couponCode.trim().toUpperCase());
       setCouponCode("");
     }
   };
@@ -52,16 +45,39 @@ const CartItems = () => {
             <div className="cartitems-format">
               <img src={item.image} alt="" className="carticon-product-icon" />
               <p>{item.name}</p>
-              <p>${item.oldPrice}</p>
 
+              {/* ✅ Show old price + offerPrice */}
+              <p>
+                {item.oldPrice && item.oldPrice !== item.price ? (
+                  <>
+                    <span
+                      style={{
+                        textDecoration: "line-through",
+                        color: "gray",
+                        marginRight: "8px",
+                      }}
+                    >
+                      ${item.price}
+                    </span>
+                    <span style={{ fontWeight: "bold", color: "green" }}>
+                      ${item.oldPrice}
+                    </span>
+                  </>
+                ) : (
+                  <>${item.oldPrice}</>
+                )}
+              </p>
+
+              {/* Quantity controls */}
               <div className="cartitems-quantity-controls">
                 <button onClick={() => removeFromCart(item.id)}>-</button>
                 <span className="cartitems-quantity">{item.qty}</span>
                 <button onClick={() => addToCart(item.id)}>+</button>
               </div>
 
-              {/* <p>${item.price * item.qty}</p> */}
+              {/* ✅ Total per item using offerPrice */}
               <p>${item.oldPrice * item.qty}</p>
+
               <img
                 src={remove_icon}
                 onClick={() => deleteFromCart(item.id)}
@@ -103,18 +119,20 @@ const CartItems = () => {
       )}
 
       {/* Promo Code */}
-      <div className="cartitems-promocode">
-        <p>If you have a promo code, Enter it here</p>
-        <div>
-          <input
-            type="text"
-            placeholder="Enter your code"
-            value={couponCode}
-            onChange={(e) => setCouponCode(e.target.value)}
-          />
-          <button onClick={handleApplyCoupon}>APPLY</button>
+      {cartDetails.length > 0 && (
+        <div className="cartitems-promocode">
+          <p>If you have a promo code, Enter it here</p>
+          <div>
+            <input
+              type="text"
+              placeholder="Enter your code"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+            />
+            <button onClick={handleApplyCoupon}>APPLY</button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

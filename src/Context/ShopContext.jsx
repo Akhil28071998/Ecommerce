@@ -17,7 +17,6 @@ const ShopProvider = ({ children }) => {
   const [allProducts, setAllProducts] = useState([]);
   const [coupon, setCoupon] = useState(null);
 
-  // Load cart & wishlist
   useEffect(() => {
     const loadData = async () => {
       if (!currentUser) {
@@ -31,7 +30,6 @@ const ShopProvider = ({ children }) => {
       }
 
       try {
-        // Cart
         const resCart = await fetch(
           `http://localhost:5000/cart?userId=${currentUser.id}`
         );
@@ -42,7 +40,6 @@ const ShopProvider = ({ children }) => {
         });
         setCartItems(newCart);
 
-        // Wishlist
         const resWish = await fetch(
           `http://localhost:5000/wishlist?userId=${currentUser.id}`
         );
@@ -56,7 +53,6 @@ const ShopProvider = ({ children }) => {
     loadData();
   }, [currentUser]);
 
-  // Save for guests
   useEffect(() => {
     if (!currentUser) {
       localStorage.setItem("guestCart", JSON.stringify(cartItems));
@@ -64,7 +60,6 @@ const ShopProvider = ({ children }) => {
     }
   }, [cartItems, wishlist, currentUser]);
 
-  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -78,7 +73,6 @@ const ShopProvider = ({ children }) => {
     fetchProducts();
   }, []);
 
-  // Add to cart
   const addToCart = async (itemId, qty = 1) => {
     if (!itemId) return console.error("Invalid productId");
 
@@ -119,7 +113,6 @@ const ShopProvider = ({ children }) => {
     }
   };
 
-  // Remove one quantity
   const removeFromCart = async (itemId) => {
     setCartItems((prev) => ({
       ...prev,
@@ -155,7 +148,6 @@ const ShopProvider = ({ children }) => {
     }
   };
 
-  // Delete item completely
   const deleteFromCart = async (itemId) => {
     setCartItems((prev) => ({ ...prev, [itemId]: 0 }));
 
@@ -176,7 +168,6 @@ const ShopProvider = ({ children }) => {
     }
   };
 
-  // Clear cart
   const clearCart = async () => {
     setCartItems(getDefaultCart());
     if (!currentUser) return;
@@ -196,7 +187,6 @@ const ShopProvider = ({ children }) => {
     }
   };
 
-  // Wishlist toggle
   const toggleWishlist = async (itemId) => {
     if (!currentUser) {
       alert("⚠️ Please login first to add items to the wishlist!");
@@ -231,7 +221,6 @@ const ShopProvider = ({ children }) => {
     }
   };
 
-  // Apply coupon
   const applyCoupon = (code) => {
     const coupons = { SAVE10: 0.1, SAVE20: 0.2, FLAT50: 50 };
     if (coupons[code]) {
@@ -243,7 +232,6 @@ const ShopProvider = ({ children }) => {
     }
   };
 
-  // Place order
   const placeOrder = async () => {
     if (!currentUser) return alert("Please login to place an order!");
     try {
@@ -253,9 +241,10 @@ const ShopProvider = ({ children }) => {
       const cartData = await res.json();
 
       for (let item of cartData) {
-        const product =
-          all_product.find((p) => String(p.id) === String(item.productId)) ||
-          allProducts.find((p) => String(p.id) === String(item.productId));
+        const source = allProducts.length > 0 ? allProducts : all_product;
+        const product = source.find(
+          (p) => String(p.id) === String(item.productId)
+        );
         if (!product) continue;
 
         const offerPrice =
@@ -290,17 +279,15 @@ const ShopProvider = ({ children }) => {
     }
   };
 
-  // Total cart amount
+  // ✅ FIX: getTotalCartAmount
   const getTotalCartAmount = () => {
-    let total = Object.keys(cartItems).reduce((sum, id) => {
-      const product =
-        all_product.find((p) => String(p.id) === String(id)) ||
-        allProducts.find((p) => String(p.id) === String(id));
+    const source = allProducts.length > 0 ? allProducts : all_product;
 
+    let total = Object.keys(cartItems).reduce((sum, id) => {
+      const product = source.find((p) => String(p.id) === String(id));
       if (!product) return sum;
 
-      const offerPrice =
-        product.new_price ?? product.offerPrice ?? product.price ?? 0;
+      const offerPrice = product.price;
       return sum + offerPrice * cartItems[id];
     }, 0);
 
@@ -310,11 +297,10 @@ const ShopProvider = ({ children }) => {
     return total;
   };
 
-  // Total items
   const getTotalCartItems = () =>
     Object.values(cartItems).reduce((sum, qty) => sum + qty, 0);
 
-  // Cart details with oldPrice for display
+  // ✅ FIX: getCartDetails
   const getCartDetails = () => {
     const source = allProducts.length > 0 ? allProducts : all_product;
 
@@ -325,8 +311,8 @@ const ShopProvider = ({ children }) => {
         return {
           id: p.id,
           name: p.name,
-          price: offerPrice, // used for totals
-          oldPrice: p.price, // used for strikethrough display
+          price: offerPrice,
+          oldPrice: p.price,
           qty: cartItems[p.id],
           image: p.image,
         };

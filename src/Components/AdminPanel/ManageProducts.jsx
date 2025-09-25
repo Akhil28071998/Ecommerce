@@ -244,8 +244,8 @@ const ProductManagement = () => {
             <th>Sr. No</th>
             <th>Preview</th>
             <th>Name</th>
-            <th>Price</th>
-            <th>Offer</th>
+            <th>New Price</th>
+            <th>Old Price</th>
             <th>Category</th>
             <th>Qty</th>
             <th>Actions</th>
