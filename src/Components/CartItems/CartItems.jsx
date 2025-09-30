@@ -11,19 +11,20 @@ const CartItems = () => {
     removeFromCart,
     deleteFromCart,
     getTotalCartAmount,
-    setCoupon,
+    applyCoupons,
+    // setcoupons,
   } = useContext(ShopContext);
 
   const navigate = useNavigate();
   const cartDetails = getCartDetails();
-  const [couponCode, setCouponCode] = useState("");
+  const [couponsCode, setCouponsCode] = useState("");
 
   const handleCheckout = () => navigate("/checkout");
 
-  const handleApplyCoupon = () => {
-    if (couponCode.trim()) {
-      setCoupon(couponCode.trim().toUpperCase());
-      setCouponCode("");
+  const handleApplyCoupons = () => {
+    if (couponsCode.trim()) {
+      applyCoupons(couponsCode.trim().toUpperCase());
+      setCouponsCode("");
     }
   };
 
@@ -126,10 +127,10 @@ const CartItems = () => {
             <input
               type="text"
               placeholder="Enter your code"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
+              value={couponsCode}
+              onChange={(e) => setCouponsCode(e.target.value)}
             />
-            <button onClick={handleApplyCoupon}>APPLY</button>
+            <button onClick={handleApplyCoupons}>APPLY</button>
           </div>
         </div>
       )}

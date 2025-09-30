@@ -15,7 +15,7 @@ const ShopProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
   const [wishlist, setWishlist] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
-  const [coupon, setCoupon] = useState(null);
+  const [coupons, setCoupons] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -221,14 +221,14 @@ const ShopProvider = ({ children }) => {
     }
   };
 
-  const applyCoupon = (code) => {
+  const applyCoupons = (code) => {
     const coupons = { SAVE10: 0.1, SAVE20: 0.2, FLAT50: 50 };
     if (coupons[code]) {
-      setCoupon(code);
-      alert(`Coupon applied: ${code}`);
+      setCoupons(code);
+      alert(`coupons applied: ${code}`);
     } else {
-      setCoupon(null);
-      alert("Invalid coupon code!");
+      setCoupons(null);
+      alert("Invalid coupons code!");
     }
   };
 
@@ -291,9 +291,9 @@ const ShopProvider = ({ children }) => {
       return sum + offerPrice * cartItems[id];
     }, 0);
 
-    if (coupon === "SAVE10") return total * 0.9;
-    if (coupon === "SAVE20") return total * 0.8;
-    if (coupon === "FLAT50") return Math.max(total - 50, 0);
+    if (coupons === "SAVE10") return total * 0.9;
+    if (coupons === "SAVE20") return total * 0.8;
+    if (coupons === "FLAT50") return Math.max(total - 50, 0);
     return total;
   };
 
@@ -326,13 +326,13 @@ const ShopProvider = ({ children }) => {
         allProducts,
         cartItems,
         wishlist,
-        coupon,
+        coupons,
+        applyCoupons,
         addToCart,
         removeFromCart,
         deleteFromCart,
         clearCart,
         toggleWishlist,
-        applyCoupon,
         getTotalCartAmount,
         getTotalCartItems,
         getCartDetails,

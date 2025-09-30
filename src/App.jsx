@@ -19,6 +19,7 @@ import AdminDashboard from "./Components/AdminPanel/AdminDashboard";
 import ManageProduct from "./Components/AdminPanel/ManageProducts";
 import ManageOrders from "./Components/AdminPanel/ManageOrders";
 import ManageUsers from "./Components/AdminPanel/ManageUsers";
+import Settings from "./Components/AdminPanel/Settings";
 import ProtectedAdminRoute from "./Routes/ProtectedAdminRoute";
 
 import men_banner from "./assets/Assets/banner_mens.png";
@@ -192,6 +193,7 @@ function App() {
           />
           <Route path="orders" element={<ManageOrders />} />
           <Route path="users" element={<ManageUsers />} />
+          <Route path="settings" element={<Settings />} /> {/* ✅ FIXED */}
         </Route>
       </Routes>
 
