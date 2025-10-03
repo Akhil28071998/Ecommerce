@@ -101,7 +101,7 @@ const ManageUsers = () => {
                     <td>{p.name || "Guest User"}</td>
                     <td>{p.email || "N/A"}</td>
                     <td>
-                      <img src={p.image} alt={p.productName} width="50" />{" "}
+                      <img src={p.image} alt={p.productName} width="50" />
                       {p.productName} × {p.quantity} — ${p.price}
                     </td>
                   </tr>
