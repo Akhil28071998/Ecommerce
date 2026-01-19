@@ -38,7 +38,7 @@ const Checkout = () => {
           status: "Pending",
         };
 
-        await fetch("http://localhost:5000/purchases", {
+        await fetch("http://localhost:3000/purchases", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(newPurchase),

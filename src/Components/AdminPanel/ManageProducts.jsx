@@ -24,7 +24,7 @@ const ProductManagement = () => {
   // Fetch products from JSON Server
   const fetchProducts = async () => {
     try {
-      const res = await fetch("http://localhost:5000/products");
+      const res = await fetch("http://localhost:3000/products");
       const data = await res.json();
       setProducts(data);
     } catch (err) {
@@ -69,7 +69,7 @@ const ProductManagement = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/products", {
+      const res = await fetch("http://localhost:3000/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -109,7 +109,7 @@ const ProductManagement = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/products/${editProduct.id}`,
+        `http://localhost:3000/products/${editProduct.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -119,12 +119,12 @@ const ProductManagement = () => {
             offerPrice: parseFloat(editProduct.offerPrice) || 0,
             quantity: parseInt(editProduct.quantity, 10) || 0,
           }),
-        }
+        },
       );
 
       const updatedProduct = await res.json();
       setProducts(
-        products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+        products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)),
       );
 
       setEditProduct(null);
@@ -137,7 +137,7 @@ const ProductManagement = () => {
   // Delete product
   const handleDeleteProduct = async (id) => {
     try {
-      await fetch(`http://localhost:5000/products/${id}`, { method: "DELETE" });
+      await fetch(`http://localhost:3000/products/${id}`, { method: "DELETE" });
       setProducts(products.filter((p) => p.id !== id));
     } catch (err) {
       console.error("Error deleting product:", err);
@@ -149,7 +149,7 @@ const ProductManagement = () => {
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = products.slice(
     indexOfFirstProduct,
-    indexOfLastProduct
+    indexOfLastProduct,
   );
   const totalPages = Math.ceil(products.length / productsPerPage);
 

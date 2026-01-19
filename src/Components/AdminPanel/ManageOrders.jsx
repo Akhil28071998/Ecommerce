@@ -12,8 +12,8 @@ const ManageOrders = () => {
     const fetchData = async () => {
       try {
         const [usersRes, purchasesRes] = await Promise.all([
-          fetch("http://localhost:5000/users"),
-          fetch("http://localhost:5000/purchases"),
+          fetch("http://localhost:3000/users"),
+          fetch("http://localhost:3000/purchases"),
         ]);
 
         if (!usersRes.ok) throw new Error("Failed to fetch users");

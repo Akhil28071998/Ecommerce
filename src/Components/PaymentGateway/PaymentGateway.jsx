@@ -81,12 +81,12 @@ const PaymentGateway = ({ onSuccess }) => {
 
         await Promise.all(
           orders.map((order) =>
-            fetch("http://localhost:5000/purchases", {
+            fetch("http://localhost:3000/purchases", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(order),
-            })
-          )
+            }),
+          ),
         );
 
         toast.success("🎉 Payment Successful! Order placed.");

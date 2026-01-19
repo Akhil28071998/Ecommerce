@@ -38,7 +38,7 @@ function App() {
 
   // Fetch products
   useEffect(() => {
-    fetch("http://localhost:5000/products")
+    fetch("http://localhost:3000/products")
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch(() => toast.error("Failed to load products"));
@@ -51,7 +51,7 @@ function App() {
         const guestCart = JSON.parse(localStorage.getItem("guestCart")) || [];
         try {
           const res = await fetch(
-            `http://localhost:5000/cart?userId=${currentUser.id}`
+            `http://localhost:3000/cart?userId=${currentUser.id}`,
           );
           const userCart = await res.json();
 
@@ -59,7 +59,7 @@ function App() {
           for (let item of guestCart) {
             const exists = userCart.find((i) => i.productId === item.id);
             if (!exists) {
-              await fetch("http://localhost:5000/cart", {
+              await fetch("http://localhost:3000/cart", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -74,7 +74,7 @@ function App() {
           localStorage.removeItem("guestCart");
 
           const res2 = await fetch(
-            `http://localhost:5000/cart?userId=${currentUser.id}`
+            `http://localhost:3000/cart?userId=${currentUser.id}`,
           );
           const updatedCart = await res2.json();
           setCart(updatedCart);
@@ -99,13 +99,13 @@ function App() {
         productId: product.id,
       };
       try {
-        await fetch("http://localhost:5000/cart", {
+        await fetch("http://localhost:3000/cart", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(productWithUser),
         });
         const res = await fetch(
-          `http://localhost:5000/cart?userId=${currentUser.id}`
+          `http://localhost:3000/cart?userId=${currentUser.id}`,
         );
         const data = await res.json();
         setCart(data);

@@ -1,22 +1,30 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./popular.css";
-import data_product from "../../assets/Assets/data";
 import PopularItem from "./PopularItem";
+import { ShopContext } from "../../Context/ShopContext";
+import { getProductImage } from "../../utils/imageLoader";
 
 const Popular = () => {
+  const { allProducts } = useContext(ShopContext);
+
+  // Filter women's products and get first 4
+  const popularItems = allProducts
+    .filter((item) => item.category === "women")
+    .slice(0, 4);
+
   return (
     <div className="popular">
       <h1>POPULAR IN WOMEN </h1>
       <hr />
       <div className="popular-item">
-        {data_product.map((item, i) => {
+        {popularItems.map((item, i) => {
           return (
             <PopularItem
               key={i}
-              image={item.image}
+              image={getProductImage(item.id)}
               name={item.name}
-              price={item.new_price}
-              old_price={item.old_price}
+              price={item.price}
+              old_price={item.offerPrice}
             />
           );
         })}

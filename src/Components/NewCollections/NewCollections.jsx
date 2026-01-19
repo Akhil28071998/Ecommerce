@@ -1,22 +1,28 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./NewCollections.css";
-import new_collections from "../../assets/Assets/new_collections";
 import Item from "../Items/Item";
+import { ShopContext } from "../../Context/ShopContext";
+import { getProductImage } from "../../utils/imageLoader";
 
 const NewCollections = () => {
+  const { allProducts } = useContext(ShopContext);
+
+  // Get last 8 products for new collections
+  const newItems = allProducts.slice(-8);
+
   return (
     <div className="new-collections">
       <h1>NEW COLLECTIONS</h1>
       <hr />
       <div className="collections">
-        {new_collections.map((item, i) => {
+        {newItems.map((item, i) => {
           return (
             <Item
               key={item.id}
-              image={item.image}
+              image={getProductImage(item.id)}
               name={item.name}
-              new_price={item.new_price}
-              old_price={item.old_price}
+              new_price={item.price}
+              old_price={item.offerPrice}
             />
           );
         })}

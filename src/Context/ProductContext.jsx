@@ -11,13 +11,12 @@ const ProductProvider = ({ children }) => {
   }, []);
   const getProduct = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/products");
+      const res = await axios.get("http://localhost:3000/products");
       setAllProduct(res.data);
     } catch (err) {
       console.error("Failed to fetch products:", err);
     }
   };
- 
 
   const value = { allproduct };
 

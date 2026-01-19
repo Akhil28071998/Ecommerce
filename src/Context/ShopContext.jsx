@@ -31,7 +31,7 @@ const ShopProvider = ({ children }) => {
 
       try {
         const resCart = await fetch(
-          `http://localhost:5000/cart?userId=${currentUser.id}`
+          `http://localhost:3000/cart?userId=${currentUser.id}`,
         );
         const cartData = await resCart.json();
         let newCart = getDefaultCart();
@@ -41,7 +41,7 @@ const ShopProvider = ({ children }) => {
         setCartItems(newCart);
 
         const resWish = await fetch(
-          `http://localhost:5000/wishlist?userId=${currentUser.id}`
+          `http://localhost:3000/wishlist?userId=${currentUser.id}`,
         );
         const wishlistData = await resWish.json();
         setWishlist(wishlistData.map((w) => w.productId));
@@ -63,7 +63,7 @@ const ShopProvider = ({ children }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/products");
+        const res = await fetch("http://localhost:3000/products");
         const data = await res.json();
         setAllProducts(data);
       } catch (err) {
@@ -85,19 +85,19 @@ const ShopProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/cart?userId=${currentUser.id}&productId=${itemId}`
+        `http://localhost:3000/cart?userId=${currentUser.id}&productId=${itemId}`,
       );
       const data = await res.json();
 
       if (data.length > 0) {
         const cartItem = data[0];
-        await fetch(`http://localhost:5000/cart/${cartItem.id}`, {
+        await fetch(`http://localhost:3000/cart/${cartItem.id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ quantity: cartItem.quantity + qty }),
         });
       } else {
-        await fetch("http://localhost:5000/cart", {
+        await fetch("http://localhost:3000/cart", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -123,7 +123,7 @@ const ShopProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/cart?userId=${currentUser.id}&productId=${itemId}`
+        `http://localhost:3000/cart?userId=${currentUser.id}&productId=${itemId}`,
       );
       const data = await res.json();
 
@@ -132,11 +132,11 @@ const ShopProvider = ({ children }) => {
         const newQty = Math.max(cartItem.quantity - 1, 0);
 
         if (newQty === 0) {
-          await fetch(`http://localhost:5000/cart/${cartItem.id}`, {
+          await fetch(`http://localhost:3000/cart/${cartItem.id}`, {
             method: "DELETE",
           });
         } else {
-          await fetch(`http://localhost:5000/cart/${cartItem.id}`, {
+          await fetch(`http://localhost:3000/cart/${cartItem.id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ quantity: newQty }),
@@ -155,11 +155,11 @@ const ShopProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/cart?userId=${currentUser.id}&productId=${itemId}`
+        `http://localhost:3000/cart?userId=${currentUser.id}&productId=${itemId}`,
       );
       const data = await res.json();
       if (data.length > 0) {
-        await fetch(`http://localhost:5000/cart/${data[0].id}`, {
+        await fetch(`http://localhost:3000/cart/${data[0].id}`, {
           method: "DELETE",
         });
       }
@@ -174,11 +174,11 @@ const ShopProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/cart?userId=${currentUser.id}`
+        `http://localhost:3000/cart?userId=${currentUser.id}`,
       );
       const data = await res.json();
       for (let item of data) {
-        await fetch(`http://localhost:5000/cart/${item.id}`, {
+        await fetch(`http://localhost:3000/cart/${item.id}`, {
           method: "DELETE",
         });
       }
@@ -197,11 +197,11 @@ const ShopProvider = ({ children }) => {
       setWishlist((prev) => prev.filter((id) => id !== itemId));
       try {
         const res = await fetch(
-          `http://localhost:5000/wishlist?userId=${currentUser.id}&productId=${itemId}`
+          `http://localhost:3000/wishlist?userId=${currentUser.id}&productId=${itemId}`,
         );
         const data = await res.json();
         if (data.length > 0)
-          await fetch(`http://localhost:5000/wishlist/${data[0].id}`, {
+          await fetch(`http://localhost:3000/wishlist/${data[0].id}`, {
             method: "DELETE",
           });
       } catch (err) {
@@ -210,7 +210,7 @@ const ShopProvider = ({ children }) => {
     } else {
       setWishlist((prev) => [...prev, itemId]);
       try {
-        await fetch("http://localhost:5000/wishlist", {
+        await fetch("http://localhost:3000/wishlist", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userId: currentUser.id, productId: itemId }),
@@ -236,21 +236,21 @@ const ShopProvider = ({ children }) => {
     if (!currentUser) return alert("Please login to place an order!");
     try {
       const res = await fetch(
-        `http://localhost:5000/cart?userId=${currentUser.id}`
+        `http://localhost:3000/cart?userId=${currentUser.id}`,
       );
       const cartData = await res.json();
 
       for (let item of cartData) {
         const source = allProducts.length > 0 ? allProducts : all_product;
         const product = source.find(
-          (p) => String(p.id) === String(item.productId)
+          (p) => String(p.id) === String(item.productId),
         );
         if (!product) continue;
 
         const offerPrice =
           product.new_price ?? product.offerPrice ?? product.price ?? 0;
 
-        await fetch("http://localhost:5000/purchases", {
+        await fetch("http://localhost:3000/purchases", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -267,7 +267,7 @@ const ShopProvider = ({ children }) => {
           }),
         });
 
-        await fetch(`http://localhost:5000/cart/${item.id}`, {
+        await fetch(`http://localhost:3000/cart/${item.id}`, {
           method: "DELETE",
         });
       }

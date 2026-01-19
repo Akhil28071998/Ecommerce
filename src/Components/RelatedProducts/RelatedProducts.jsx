@@ -1,22 +1,28 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./RelatedProducts.css";
-import data_product from "../../assets/Assets/data";
 import Item from "./../Items/Item";
+import { ShopContext } from "../../Context/ShopContext";
+import { getProductImage } from "../../utils/imageLoader";
 
 const RelatedProducts = () => {
+  const { allProducts } = useContext(ShopContext);
+
+  // Get a sample of related products (first 4)
+  const relatedItems = allProducts.slice(0, 4);
+
   return (
     <div className="relatedproducts">
       <h1>Related Products</h1>
       <hr />
       <div className="relatedproducts-item">
-        {data_product.map((item) => (
+        {relatedItems.map((item) => (
           <Item
             key={item.id}
             id={item.id}
-            image={item.image}
+            image={getProductImage(item.id)}
             name={item.name}
-            new_price={item.new_price}
-            old_price={item.old_price}
+            new_price={item.price}
+            old_price={item.offerPrice}
           />
         ))}
       </div>
