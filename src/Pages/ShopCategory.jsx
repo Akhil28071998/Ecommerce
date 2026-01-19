@@ -3,6 +3,7 @@ import "./Css/ShopCategory.css";
 import dropdown_icon from "../assets/Assets/dropdown_icon.png";
 import Item from "../Components/Items/Item.jsx";
 import axios from "axios";
+import { getProductImage } from "../utils/imageLoader";
 
 const ShopCategory = (props) => {
   const [items, setItems] = useState([]);
@@ -14,7 +15,7 @@ const ShopCategory = (props) => {
 
   const getProduct = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/products");
+      const res = await axios.get("http://localhost:3000/products");
       setItems(res.data);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -42,7 +43,7 @@ const ShopCategory = (props) => {
                 key={i}
                 id={item.id}
                 name={item.name}
-                image={item.image}
+                image={getProductImage(item.id)}
                 new_price={item.offerPrice} // discounted price
                 old_price={item.price} // original price
               />

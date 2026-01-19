@@ -21,7 +21,7 @@ ChartJS.register(
   ArcElement,
   Tooltip,
   Legend,
-  Title
+  Title,
 );
 
 const AdminDashboard = () => {
@@ -34,9 +34,9 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const [ordersRes, productsRes, usersRes] = await Promise.all([
-          axios.get("http://localhost:5000/purchases"), // use purchases endpoint
-          axios.get("http://localhost:5000/products"),
-          axios.get("http://localhost:5000/users"),
+          axios.get("http://localhost:3000/purchases"), // use purchases endpoint
+          axios.get("http://localhost:3000/products"),
+          axios.get("http://localhost:3000/users"),
         ]);
 
         setOrders(ordersRes.data);

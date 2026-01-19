@@ -24,7 +24,7 @@ const AuthProvider = ({ children }) => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/users?email=${email}`);
+      const res = await fetch(`http://localhost:3000/users?email=${email}`);
       const existing = await res.json();
 
       if (existing.length > 0) {
@@ -35,7 +35,7 @@ const AuthProvider = ({ children }) => {
       // By default, every signup is a normal "user"
       const newUser = { name, email, password, role: "user" };
 
-      const createRes = await fetch("http://localhost:5000/users", {
+      const createRes = await fetch("http://localhost:3000/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
@@ -63,7 +63,7 @@ const AuthProvider = ({ children }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/users?email=${email}&password=${password}`
+        `http://localhost:3000/users?email=${email}&password=${password}`,
       );
       const data = await res.json();
 

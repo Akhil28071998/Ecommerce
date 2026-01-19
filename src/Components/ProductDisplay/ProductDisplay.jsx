@@ -5,6 +5,7 @@ import star_icon from "../../assets/Assets/star_icon.png";
 import star_dull_icon from "../../assets/Assets/star_dull_icon.png";
 import { ShopContext } from "../../Context/ShopContext";
 import { ProductContext } from "../../Context/ProductContext";
+import { getProductImage } from "../../utils/imageLoader";
 
 const ProductDisplay = () => {
   const { productId } = useParams();
@@ -18,7 +19,7 @@ const ProductDisplay = () => {
   const product = allproduct?.find((p) => String(p.id) === String(productId));
 
   useEffect(() => {
-    if (product) setMainImage(product.image || "");
+    if (product) setMainImage(getProductImage(product.id));
   }, [product]);
 
   if (!product) return <div className="productdisplay">Loading product...</div>;
@@ -39,18 +40,19 @@ const ProductDisplay = () => {
     <div className="productdisplay">
       <div className="productdisplay-left">
         <div className="productdisplay-img-list">
-          {product.image &&
-            [...Array(4)].map((_, i) => (
-              <img
-                key={`${product.id}-${i}`}
-                src={product.image}
-                alt={`thumb-${i}`}
-                className={
-                  mainImage === product.image ? "active-thumbnail" : ""
-                }
-                onClick={() => setMainImage(product.image)}
-              />
-            ))}
+          {product.id &&
+            [...Array(4)].map((_, i) => {
+              const productImg = getProductImage(product.id);
+              return (
+                <img
+                  key={`${product.id}-${i}`}
+                  src={productImg}
+                  alt={`thumb-${i}`}
+                  className={mainImage === productImg ? "active-thumbnail" : ""}
+                  onClick={() => setMainImage(productImg)}
+                />
+              );
+            })}
         </div>
 
         <div
